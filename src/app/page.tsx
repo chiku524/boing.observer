@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useNetwork } from "@/context/network-context";
 import { SearchBar } from "@/components/search-bar";
+import { NetworkStats } from "@/components/network-stats";
 import { fetchChainHeight, fetchBlockByHeight } from "@/lib/rpc-methods";
 import type { Block } from "@/lib/rpc-types";
 import { shortenHash } from "@/lib/rpc-types";
@@ -67,6 +68,8 @@ export default function HomePage() {
           {error}
         </div>
       )}
+
+      <NetworkStats />
 
       <section>
         <h2 className="font-display text-xl font-semibold text-[var(--text-primary)]">

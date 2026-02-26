@@ -29,6 +29,9 @@ export const metadata: Metadata = {
     "block explorer",
     "testnet",
     "mainnet",
+    "quality assurance",
+    "consensus",
+    "True QA",
   ],
   authors: [{ name: "Boing Network", url: SITE_URL }],
   creator: "Boing Network",
@@ -126,7 +129,7 @@ export default function RootLayout({
         />
         <NetworkProvider>
           <Header />
-          <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">{children}</main>
+          <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6" role="main" id="main-content">{children}</main>
           <footer className="mt-auto border-t border-[var(--border-color)] py-6 text-center text-sm text-[var(--text-muted)]">
             Boing Network — Authentic. Decentralized. Optimal. Sustainable.
           </footer>

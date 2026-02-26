@@ -57,6 +57,7 @@ export function SearchBar() {
           type="button"
           onClick={() => search()}
           disabled={loading}
+          aria-label={loading ? "Searching…" : "Search"}
           className="rounded-lg bg-network-primary px-4 py-2.5 font-display text-sm font-semibold text-white hover:bg-network-primary-light transition-colors focus:outline-none focus:ring-2 focus:ring-network-cyan disabled:opacity-60"
         >
           {loading ? "…" : "Search"}
