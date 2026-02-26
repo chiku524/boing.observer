@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@600;700;900&display=swap');
+
+:root {
+  --boing-black: #020408;
+  --boing-navy: #0c1428;
+  --boing-navy-mid: #0d1f3c;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --network-primary: #7c3aed;
+  --network-primary-light: #a78bfa;
+  --network-cyan: #06b6d4;
+  --network-cyan-light: #22d3ee;
+  --network-gold: #fbbf24;
+  --border-color: rgba(124, 58, 237, 0.18);
+  --border-hover: rgba(124, 58, 237, 0.45);
+}
+
+body {
+  background-color: var(--boing-black);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Glass card */
+.glass-card {
+  background: rgba(8, 13, 26, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.glass-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.15);
+}
+
+/* Monospace for hashes and addresses */
+.hash {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  word-break: break-all;
+}
+
+.address-link {
+  @apply hash text-network-cyan hover:text-network-cyan-light underline underline-offset-2 transition-colors;
+}

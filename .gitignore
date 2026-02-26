@@ -1,0 +1,35 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build / OpenNext (Cloudflare)
+.next
+.open-next
+out
+
+# Env (do not commit secrets)
+.env
+.env.local
+.dev.vars
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug / IDE
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+*.pem
+
+# Vercel (if used elsewhere)
+.vercel
+
+# TypeScript
+next-env.d.ts
+cloudflare-env.d.ts
+
+# Testing
+coverage
+.nyc_output

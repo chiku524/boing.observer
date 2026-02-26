@@ -1,1 +1,160 @@
-# boing-explorer
+# Boing Observer — Blockchain Explorer
+
+Blockchain explorer for **Boing Network** at **boing.observer**. Browse blocks, transactions, and accounts on devnet/testnet and mainnet.
+
+## Features
+
+- **Network selector** — Switch between Testnet and Mainnet (RPC URLs from env).
+- **Home** — Current chain height and list of latest blocks.
+- **Block page** — By height (`/block/:height`) or hash (`/block/hash/:hash`): header (hash, height, timestamp, proposer, parent hash, roots) and transaction list with type/sender/summary.
+- **Account page** — Balance, nonce, and stake for a 32-byte hex address (`/account/:address`).
+- **Search** — By block height (number), block hash (64 hex), or account address (64 hex). Dispatches to the appropriate page (64-hex tries block-by-hash first, then account).
+
+## Tech stack
+
+- **Next.js 14** (App Router), React 18, TypeScript
+- **Tailwind CSS** with Boing design tokens (Cosmic Foundation: dark theme, Orbitron/Inter/JetBrains Mono, glass cards)
+- **RPC** — Plain `fetch()` JSON-RPC 2.0 to Boing node (no SDK)
+- **Cloudflare** — Deploy via [OpenNext Cloudflare adapter](https://opennext.js.org/cloudflare) to Workers; custom domain **boing.observer**
+
+## Setup
+
+1. Clone and install:
+
+   ```bash
+   npm install --legacy-peer-deps
+   ```
+
+   (Use `--legacy-peer-deps` because the Cloudflare adapter targets Next 15+; see [Hosting on Cloudflare](#hosting-on-cloudflare-boingobserver).)
+
+2. Copy env and set RPC URLs:
+
+   ```bash
+   cp .env.example .env.local
+   # Edit .env.local: set NEXT_PUBLIC_TESTNET_RPC and NEXT_PUBLIC_MAINNET_RPC
+   ```
+
+3. Run:
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000).
+
+## Config
+
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_TESTNET_RPC` | Testnet/devnet RPC base URL (e.g. `https://testnet-rpc.boing.network/`). |
+| `NEXT_PUBLIC_MAINNET_RPC` | Mainnet RPC base URL (when available). |
+
+No API keys required for read-only RPC. Do not hardcode production RPC URLs in the repo; use `.env.local` or hosting env.
+
+## Hosting on Cloudflare (boing.observer)
+
+This project is set up to deploy to **Cloudflare Workers** using the [OpenNext Cloudflare adapter](https://opennext.js.org/cloudflare), so you can serve the explorer at **boing.observer**.
+
+### Prerequisites
+
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/) (included as dev dependency; use v3.99+).
+- A Cloudflare account.
+- The domain **boing.observer** added to Cloudflare (DNS managed by Cloudflare).
+
+### Deploy from your machine
+
+1. Log in to Cloudflare (first time only):
+
+   ```bash
+   npx wrangler login
+   ```
+
+2. Set production RPC URLs (for the Worker’s runtime). Either:
+   - Add `NEXT_PUBLIC_TESTNET_RPC` and `NEXT_PUBLIC_MAINNET_RPC` in **Cloudflare Dashboard** → Workers & Pages → your Worker → Settings → Variables, or  
+   - Use [Wrangler secrets](https://developers.cloudflare.com/workers/configuration/secrets/) if you prefer CLI.
+
+3. Build and deploy:
+
+   ```bash
+   npm run deploy
+   ```
+
+   This runs `opennextjs-cloudflare build` then deploys the Worker. The first time, Wrangler will create a new Worker named **boing-observer** (see `wrangler.jsonc`).
+
+4. Attach the custom domain **boing.observer**:
+   - In **Cloudflare Dashboard** go to **Workers & Pages** → **boing-observer** → **Settings** → **Domains & Routes**.
+   - Click **Add** and add **boing.observer** (and optionally **www.boing.observer**).  
+   Cloudflare will create the DNS record and serve the explorer at **https://boing.observer**.
+
+### Deploy from Git (CI/CD)
+
+1. In **Cloudflare Dashboard** go to **Workers & Pages** → **Create** → **Pages** → **Connect to Git** (or use **Create application** → **Workers** and connect Git).
+2. Select this repository and set:
+   - **Build command:** `npm run deploy` (or use a build step that runs `opennextjs-cloudflare build` and then deploy via Wrangler in CI).
+   - **Build output:** OpenNext produces a Worker; follow [Cloudflare’s “Connect a Git repo”](https://developers.cloudflare.com/workers/ci-cd/) for Workers/Pages.
+3. Add `NEXT_PUBLIC_TESTNET_RPC` and `NEXT_PUBLIC_MAINNET_RPC` as environment variables in the project settings.
+4. After each deploy, ensure **boing.observer** is set under **Domains & Routes** for the Worker.
+
+### Useful commands
+
+| Command | Description |
+|--------|-------------|
+| `npm run dev` | Local Next.js dev server. |
+| `npm run build` | Next.js production build only. |
+| `npm run preview` | Build with OpenNext and run locally in Workers runtime. |
+| `npm run deploy` | Build and deploy to Cloudflare. |
+| `npm run upload` | Build and upload a new version (for gradual deployments). |
+| `npm run cf-typegen` | Generate Cloudflare env types into `cloudflare-env.d.ts`. |
+
+### Worker size
+
+Workers have a [size limit](https://developers.cloudflare.com/workers/platform/limits/#worker-size) (e.g. 3 MiB compressed on Free, 10 MiB on Paid). After `npm run deploy`, Wrangler prints the compressed size; if you hit the limit, consider moving to a Paid plan or trimming dependencies.
+
+### Note on Next.js 14 and install
+
+This app uses **Next.js 14**. The OpenNext Cloudflare adapter’s current release targets Next 15/16, so:
+
+- Install with **`npm install --legacy-peer-deps`** to resolve peer dependency conflicts.
+- Deploy scripts pass **`--dangerouslyUseUnsupportedNextVersion`** to the OpenNext build so the adapter accepts Next 14. When you upgrade to Next 15+, you can remove that flag and re-evaluate `--legacy-peer-deps`.
+
+## SEO
+
+The explorer is optimized for search engines and social sharing:
+
+- **Metadata** — Title, description, keywords, Open Graph, and Twitter cards in the root layout.
+- **Dynamic metadata** — Block and account pages get unique titles and descriptions from route params.
+- **robots.txt** — Generated at `/robots.txt` (allows all, points to sitemap).
+- **Sitemap** — Generated at `/sitemap.xml` (home page).
+- **Structured data** — JSON-LD WebSite and Organization schema for rich search results.
+- **Manifest** — PWA manifest at `/manifest.json`.
+- **Images** — OG image, favicon, and Apple touch icon are generated by a script (see below).
+
+### Generating SEO assets
+
+To (re)generate `og-image.png`, `favicon.ico`, and `apple-touch-icon.png`:
+
+```bash
+pip install -r requirements-seo.txt
+python scripts/generate-seo-assets.py
+```
+
+Output files go to `public/`.
+
+### Search engine verification
+
+Add verification codes from [Google Search Console](https://search.google.com/search-console) or [Bing Webmaster Tools](https://www.bing.com/webmasters) via environment variables:
+
+```
+NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=your-google-code
+NEXT_PUBLIC_BING_SITE_VERIFICATION=your-bing-code
+```
+
+## Reference
+
+- **RPC spec:** `boing-network/docs/RPC-API-SPEC.md`
+- **Design system:** `boing-network/docs/BOING-DESIGN-SYSTEM.md`
+- **Explorer prompt:** `boing-network/docs/BOING-OBSERVER-EXPLORER-PROMPT.md`
+
+---
+
+*Boing Network — Authentic. Decentralized. Optimal. Sustainable.*

@@ -1,0 +1,18 @@
+# Static asset caching for Cloudflare (OpenNext)
+# https://opennext.js.org/cloudflare/caching#static-assets-caching
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# SEO and discoverability
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+  X-Robots-Tag: all
+
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+# Security headers
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
