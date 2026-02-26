@@ -86,14 +86,16 @@ This project is set up to deploy to **Cloudflare Workers** using the [OpenNext C
    - Click **Add** and add **boing.observer** (and optionally **www.boing.observer**).  
    Cloudflare will create the DNS record and serve the explorer at **https://boing.observer**.
 
-### Deploy from Git (CI/CD)
+### Deploy from Git (GitHub Actions)
 
-1. In **Cloudflare Dashboard** go to **Workers & Pages** → **Create** → **Pages** → **Connect to Git** (or use **Create application** → **Workers** and connect Git).
-2. Select this repository and set:
-   - **Build command:** `npm run deploy` (or use a build step that runs `opennextjs-cloudflare build` and then deploy via Wrangler in CI).
-   - **Build output:** OpenNext produces a Worker; follow [Cloudflare’s “Connect a Git repo”](https://developers.cloudflare.com/workers/ci-cd/) for Workers/Pages.
-3. Add `NEXT_PUBLIC_TESTNET_RPC` and `NEXT_PUBLIC_MAINNET_RPC` as environment variables in the project settings.
-4. After each deploy, ensure **boing.observer** is set under **Domains & Routes** for the Worker.
+This repo includes a GitHub Actions workflow that deploys on every push to `main`. One-time setup:
+
+1. **Create a Cloudflare API token** — [Cloudflare Dashboard](https://dash.cloudflare.com/) → **My Profile** → **API Tokens** → **Create Token** (use **Edit Cloudflare Workers** template).
+2. **Get your Account ID** — In Cloudflare Dashboard, select any domain; Account ID is in the right sidebar under **API**.
+3. **Add GitHub Secrets** — Repo → **Settings** → **Secrets and variables** → **Actions**. Add: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `NEXT_PUBLIC_TESTNET_RPC`, `NEXT_PUBLIC_MAINNET_RPC`.
+4. **Attach custom domain** (first deploy) — **Workers & Pages** → **boing-observer** → **Settings** → **Domains & Routes** → add **boing.observer**.
+
+Pushes to `main` trigger deployment; see **Actions** tab for status.
 
 ### Useful commands
 
