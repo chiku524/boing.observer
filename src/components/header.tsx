@@ -34,14 +34,12 @@ export function Header() {
           >
             About
           </Link>
-          <a
-            href="https://boing.network/network/faucet"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/faucet"
             className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             Faucet
-          </a>
+          </Link>
           <NetworkSelector />
         </nav>
       </div>

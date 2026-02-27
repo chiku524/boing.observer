@@ -1,7 +1,6 @@
 /**
  * Infer transaction payload type from payload object for display.
- * Matches spec: Transfer (to, amount), Bond (amount), Unbond (amount),
- * ContractCall (contract, calldata), ContractDeploy (bytecode).
+ * Matches spec: Transfer, Bond, Unbond, ContractCall, ContractDeploy, ContractDeployWithPurpose.
  */
 
 import type { TxPayloadKind } from "./rpc-types";
@@ -9,7 +8,9 @@ import type { TxPayloadKind } from "./rpc-types";
 export function getTxPayloadKind(payload: unknown): TxPayloadKind {
   if (!payload || typeof payload !== "object") return "Unknown";
   const p = payload as Record<string, unknown>;
-  if ("bytecode" in p) return "ContractDeploy";
+  if ("bytecode" in p) {
+    return "purpose_category" in p ? "ContractDeployWithPurpose" : "ContractDeploy";
+  }
   if ("contract" in p) return "ContractCall";
   if ("to" in p && "amount" in p) return "Transfer";
   if ("amount" in p && Object.keys(p).length <= 2) {
@@ -41,6 +42,8 @@ export function getTxPayloadSummary(payload: unknown): string {
       return `contract ${formatShortAddr(String(p.contract))}`;
     case "ContractDeploy":
       return "deploy contract";
+    case "ContractDeployWithPurpose":
+      return `deploy contract · ${formatPurpose(String(p.purpose_category ?? "other"))}`;
     default:
       return "—";
   }
@@ -49,6 +52,11 @@ export function getTxPayloadSummary(payload: unknown): string {
 function formatShortAddr(hex: string): string {
   const h = hex.startsWith("0x") ? hex.slice(2) : hex;
   return h.length > 12 ? `${h.slice(0, 6)}…${h.slice(-4)}` : h;
+}
+
+function formatPurpose(cat: string): string {
+  if (!cat || cat === "other") return "other";
+  return cat.toLowerCase();
 }
 
 function formatAmount(raw: string): string {

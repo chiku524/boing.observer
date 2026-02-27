@@ -46,6 +46,7 @@ export type TxPayloadKind =
   | "Unbond"
   | "ContractCall"
   | "ContractDeploy"
+  | "ContractDeployWithPurpose"
   | "Unknown";
 
 export interface TxPayloadTransfer {

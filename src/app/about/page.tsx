@@ -2,15 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 const SITE_URL = "https://boing.observer";
+const DOCS_BASE =
+  "https://github.com/boing-network/boing.network/blob/main/docs";
 
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Learn about Boing Network's pillars: True Quality Assurance, decentralization, optimal performance, and sustainability. Assets are rejected, approved, or sent to the consensus pool.",
+    "Learn about Boing Network's six pillars: Security, Scalability, Decentralization, Authenticity, Transparency, and True Quality Assurance.",
   openGraph: {
     title: "About Boing Network | Boing Observer",
     description:
-      "True QA, decentralization, optimal performance, sustainability. Boing Network — Authentic. Decentralized. Optimal. Sustainable.",
+      "Six pillars: Security, Scalability, Decentralization, Authenticity, Transparency, True QA. Boing Network — Authentic. Decentralized. Optimal. Sustainable.",
   },
   alternates: {
     canonical: `${SITE_URL}/about`,
@@ -21,7 +23,11 @@ export default function AboutPage() {
   return (
     <div className="space-y-10 max-w-3xl">
       <nav aria-label="Breadcrumb" className="text-sm">
-        <ol className="flex items-center gap-2 text-[var(--text-muted)]" itemScope itemType="https://schema.org/BreadcrumbList">
+        <ol
+          className="flex items-center gap-2 text-[var(--text-muted)]"
+          itemScope
+          itemType="https://schema.org/BreadcrumbList"
+        >
           <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
             <Link href="/" className="text-network-cyan hover:text-network-cyan-light hover:underline" itemProp="item">
               <span itemProp="name">Home</span>
@@ -43,49 +49,95 @@ export default function AboutPage() {
         <p className="mt-2 text-[var(--text-secondary)]">
           Boing Network — <em>Authentic. Decentralized. Optimal. Sustainable.</em>
         </p>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Six pillars guide design and operations: Security, Scalability, Decentralization, Authenticity, Transparency, True Quality Assurance.
+        </p>
       </header>
 
       <section className="space-y-6">
         <h2 className="font-display text-xl font-semibold text-[var(--text-primary)]">
-          Our pillars
+          Six pillars
         </h2>
         <div className="space-y-6">
           <div className="glass-card p-6">
             <h3 className="font-display font-semibold text-network-cyan mb-2">
-              True quality assurance
+              1. Security
             </h3>
             <p className="text-[var(--text-secondary)] leading-relaxed">
-              Every asset on Boing Network undergoes automated quality assurance. Assets are either{" "}
-              <strong className="text-[var(--text-primary)]">rejected</strong>,{" "}
-              <strong className="text-[var(--text-primary)]">approved</strong>, or sent to a{" "}
-              <strong className="text-[var(--text-primary)]">consensus pool</strong> for further validation. This ensures only genuine, high-quality content and data reach the network, building trust at the protocol level.
+              Safety and correctness over speed. BFT consensus (HotStuff), Ed25519 + BLAKE3, RPC rate limiting, equivocation detection. Security advisories and incident response per{" "}
+              <a
+                href={`${DOCS_BASE}/SECURITY-STANDARDS.md`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-network-cyan hover:underline"
+              >
+                SECURITY-STANDARDS
+              </a>
+              .
             </p>
           </div>
 
           <div className="glass-card p-6">
             <h3 className="font-display font-semibold text-network-cyan mb-2">
-              Decentralized
+              2. Scalability
             </h3>
             <p className="text-[var(--text-secondary)] leading-relaxed">
-              No single entity controls the network. Validators, stakers, and participants work together to secure the chain and reach consensus.
+              High throughput without compromising other pillars. Parallel transfers, conflict-free scheduling, gas metering. Typical block time ~2 seconds; access-list batching enables parallel execution.
             </p>
           </div>
 
           <div className="glass-card p-6">
             <h3 className="font-display font-semibold text-network-cyan mb-2">
-              Optimal
+              3. Decentralization
             </h3>
             <p className="text-[var(--text-secondary)] leading-relaxed">
-              Designed for performance and low latency. Boing Network aims for efficient block production and minimal friction for developers and users.
+              Permissionless participation. No whitelist; anyone with stake can validate. P2P (libp2p), bootnodes, DHT (roadmap). No central gatekeeper for consensus, governance, or QA.
             </p>
           </div>
 
           <div className="glass-card p-6">
             <h3 className="font-display font-semibold text-network-cyan mb-2">
-              Sustainable
+              4. Authenticity
             </h3>
             <p className="text-[var(--text-secondary)] leading-relaxed">
-              Energy-efficient consensus and resource-conscious design to ensure long-term viability.
+              Unique architecture and identity. Custom VM (stack-based, Boing opcodes), HotStuff BFT consensus, BLAKE3 + Ed25519, independent L1 — not a fork or framework.
+            </p>
+          </div>
+
+          <div className="glass-card p-6">
+            <h3 className="font-display font-semibold text-network-cyan mb-2">
+              5. Transparency
+            </h3>
+            <p className="text-[var(--text-secondary)] leading-relaxed">
+              100% openness. Open source, public specs, account proof APIs, human-readable signing. QA rejections include <code className="px-1.5 py-0.5 rounded bg-white/10 text-xs">rule_id</code> and <code className="px-1.5 py-0.5 rounded bg-white/10 text-xs">message</code> for structured feedback.
+            </p>
+          </div>
+
+          <div className="glass-card p-6">
+            <h3 className="font-display font-semibold text-network-cyan mb-2">
+              6. True quality assurance
+            </h3>
+            <p className="text-[var(--text-secondary)] leading-relaxed">
+              Protocol-enforced QA: only assets meeting rules and security bar are allowed. Meme leniency; no malice. Every deployment is <strong className="text-[var(--text-primary)]">rejected</strong>, <strong className="text-[var(--text-primary)]">approved</strong>, or sent to a{" "}
+              <strong className="text-[var(--text-primary)]">consensus pool</strong> for validation. Opcode whitelist, well-formedness, blocklist, scam patterns, purpose declaration. See{" "}
+              <a
+                href={`${DOCS_BASE}/QA-PASS-GUIDE.md`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-network-cyan hover:underline"
+              >
+                How to pass QA
+              </a>{" "}
+              and{" "}
+              <a
+                href={`${DOCS_BASE}/CANONICAL-MALICE-DEFINITION.md`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-network-cyan hover:underline"
+              >
+                Canonical malice definition
+              </a>
+              .
             </p>
           </div>
         </div>
@@ -96,14 +148,24 @@ export default function AboutPage() {
           Boing Observer
         </h2>
         <p className="text-[var(--text-secondary)] leading-relaxed">
-          Boing Observer is the official blockchain explorer for Boing Network. Search by block height, block hash, or account address. Switch between Testnet and Mainnet to explore the chain.
+          Boing Observer is the official blockchain explorer for Boing Network. Search by block height, block hash, or account address. Switch between Testnet and Mainnet. Use the{" "}
+          <Link href="/tools/qa-check" className="text-network-cyan hover:underline">QA Check</Link>{" "}
+          tool to verify bytecode before deployment, and the <Link href="/faucet" className="text-network-cyan hover:underline">Faucet</Link> for testnet BOING.
         </p>
-        <Link
-          href="/"
-          className="mt-4 inline-flex items-center gap-2 text-network-cyan hover:text-network-cyan-light font-medium transition-colors"
-        >
-          Explore the blockchain →
-        </Link>
+        <div className="mt-4 flex flex-wrap gap-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-network-cyan hover:text-network-cyan-light font-medium transition-colors"
+          >
+            Explore the blockchain →
+          </Link>
+          <Link
+            href="/tools/qa-check"
+            className="inline-flex items-center gap-2 text-network-cyan hover:text-network-cyan-light font-medium transition-colors"
+          >
+            QA Check tool →
+          </Link>
+        </div>
       </section>
     </div>
   );
