@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { NetworkProvider } from "@/context/network-context";
 import { Header } from "@/components/header";
+import { NetworkStatusBanner } from "@/components/network-status-banner";
 
 const SITE_URL = "https://boing.observer";
 
@@ -129,6 +130,7 @@ export default function RootLayout({
         />
         <NetworkProvider>
           <Header />
+          <NetworkStatusBanner />
           <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6" role="main" id="main-content">{children}</main>
           <footer className="mt-auto border-t border-[var(--border-color)] py-6 text-center text-sm text-[var(--text-muted)]">
             Boing Network — Authentic. Decentralized. Optimal. Sustainable.

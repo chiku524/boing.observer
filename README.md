@@ -27,11 +27,10 @@ Blockchain explorer for **Boing Network** at **boing.observer**. Browse blocks, 
 
    (Use `--legacy-peer-deps` because the Cloudflare adapter targets Next 15+; see [Hosting on Cloudflare](#hosting-on-cloudflare-boingobserver).)
 
-2. Copy env and set RPC URLs:
+2. Copy env (includes live testnet RPC by default):
 
    ```bash
    cp .env.example .env.local
-   # Edit .env.local: set NEXT_PUBLIC_TESTNET_RPC and NEXT_PUBLIC_MAINNET_RPC
    ```
 
 3. Run:
@@ -50,6 +49,20 @@ Blockchain explorer for **Boing Network** at **boing.observer**. Browse blocks, 
 | `NEXT_PUBLIC_MAINNET_RPC` | Mainnet RPC base URL (when available). |
 
 No API keys required for read-only RPC. Do not hardcode production RPC URLs in the repo; use `.env.local` or hosting env.
+
+## Testnet launch readiness
+
+For the Boing incentivized testnet launch, the following must be in place for the explorer (and other apps) to work:
+
+| Item | Status | Notes |
+|------|--------|-------|
+| **Public testnet RPC** | Required | At least one stable URL (e.g. `https://testnet-rpc.boing.network`). Set in `NEXT_PUBLIC_TESTNET_RPC`. |
+| **boing-node** | Required | Validators and full nodes must run `boing-node`; RPC on port 8545. |
+| **Genesis / chain ID** | Required | Chain must be live and producing blocks. |
+| **Faucet** | Recommended | Testnet BOING for validators and developers. |
+| **Explorer configured** | Ready | boing.observer uses env vars; update Cloudflare/GitHub secrets when RPC is live. |
+
+Until public RPC nodes are available, the explorer shows a friendly message: *"Boing Network nodes are not yet available"* and suggests running `boing-node` locally. When RPC is reachable, the status banner hides automatically.
 
 ## Hosting on Cloudflare (boing.observer)
 

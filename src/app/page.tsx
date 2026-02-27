@@ -6,6 +6,7 @@ import { useNetwork } from "@/context/network-context";
 import { SearchBar } from "@/components/search-bar";
 import { NetworkStats } from "@/components/network-stats";
 import { fetchChainHeight, fetchBlockByHeight } from "@/lib/rpc-methods";
+import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
 import type { Block } from "@/lib/rpc-types";
 import { shortenHash } from "@/lib/rpc-types";
 
@@ -39,7 +40,7 @@ export default function HomePage() {
         );
       })
       .catch((e) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load");
+        if (!cancelled) setError(getFriendlyRpcErrorMessage(e, network, "general"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -64,7 +65,7 @@ export default function HomePage() {
       </section>
 
       {error && (
-        <div className="glass-card border-red-500/40 bg-red-950/20 p-4 text-red-300">
+        <div className="glass-card border-amber-500/40 bg-amber-950/20 p-4 text-amber-200" role="alert">
           {error}
         </div>
       )}

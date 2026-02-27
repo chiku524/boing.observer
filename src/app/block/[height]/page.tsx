@@ -8,6 +8,7 @@ import { fetchBlockByHeight } from "@/lib/rpc-methods";
 import type { Block, BlockTransaction } from "@/lib/rpc-types";
 import { shortenHash, formatBalance } from "@/lib/rpc-types";
 import { getTxPayloadKind, getTxPayloadSummary } from "@/lib/tx-payload";
+import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
 
 function TxRow({ tx, index, network }: { tx: BlockTransaction; index: number; network: string }) {
   const kind = getTxPayloadKind(tx.payload);
@@ -56,7 +57,7 @@ export default function BlockByHeightPage() {
         if (!cancelled) setBlock(b ?? null);
       })
       .catch((e) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load block");
+        if (!cancelled) setError(getFriendlyRpcErrorMessage(e, network, "block"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -92,7 +93,7 @@ export default function BlockByHeightPage() {
       </h1>
 
       {loading && <p className="text-[var(--text-muted)]">Loading…</p>}
-      {error && <p className="text-red-400">{error}</p>}
+      {error && <p className="text-amber-300" role="alert">{error}</p>}
       {!loading && !error && !block && <p className="text-[var(--text-muted)]">Block not found.</p>}
 
       {block && (

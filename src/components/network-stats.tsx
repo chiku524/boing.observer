@@ -9,6 +9,7 @@ import {
   formatStatValue,
   type NetworkStats,
 } from "@/lib/network-stats";
+import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
 
 const BLOCKS_TO_SAMPLE = 20;
 const REFRESH_INTERVAL_MS = 15_000;
@@ -68,7 +69,7 @@ export function NetworkStats() {
       );
       setStats(computeNetworkStats(h, valid));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load stats");
+      setError(getFriendlyRpcErrorMessage(e, network, "stats"));
       setStats(null);
     } finally {
       setLoading(false);
@@ -87,8 +88,8 @@ export function NetworkStats() {
         className="py-4"
         aria-label="Network statistics"
       >
-        <div className="glass-card border-red-500/30 bg-red-950/20 p-4 text-sm text-red-300">
-          Could not load network stats: {error}
+        <div className="glass-card border-amber-500/30 bg-amber-950/20 p-4 text-sm text-amber-200" role="alert">
+          {error}
         </div>
       </section>
     );

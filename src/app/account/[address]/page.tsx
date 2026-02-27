@@ -7,6 +7,7 @@ import { useNetwork } from "@/context/network-context";
 import { fetchAccount } from "@/lib/rpc-methods";
 import type { Account } from "@/lib/rpc-types";
 import { normalizeAddress, formatBalance, shortenHash } from "@/lib/rpc-types";
+import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
 
 export default function AccountPage() {
   const params = useParams();
@@ -32,7 +33,7 @@ export default function AccountPage() {
         if (!cancelled) setAccount(a);
       })
       .catch((e) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load account");
+        if (!cancelled) setError(getFriendlyRpcErrorMessage(e, network, "account"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -63,7 +64,7 @@ export default function AccountPage() {
       </p>
 
       {loading && <p className="text-[var(--text-muted)]">Loading…</p>}
-      {error && <p className="text-red-400">{error}</p>}
+      {error && <p className="text-amber-300" role="alert">{error}</p>}
 
       {!loading && !error && account && (
         <div className="glass-card p-6 space-y-4">
