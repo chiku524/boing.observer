@@ -1,9 +1,12 @@
 /**
  * Boing JSON-RPC client (HTTP POST). No SDK required.
  * Base URL from config (e.g. NEXT_PUBLIC_TESTNET_RPC).
+ * Defaults to public testnet when env is not set.
  */
 
 import type { JsonRpcRequest, JsonRpcResponse } from "./rpc-types";
+
+const PUBLIC_TESTNET_RPC = "https://testnet-rpc.boing.network";
 
 let rpcId = 0;
 
@@ -37,14 +40,12 @@ export async function rpcCall<T>(
 }
 
 export function getRpcBaseUrl(network: "testnet" | "mainnet"): string {
-  if (typeof window !== "undefined") {
-    const testnet = process.env.NEXT_PUBLIC_TESTNET_RPC;
-    const mainnet = process.env.NEXT_PUBLIC_MAINNET_RPC;
-    if (network === "testnet" && testnet) return testnet.replace(/\/$/, "");
-    if (network === "mainnet" && mainnet) return mainnet.replace(/\/$/, "");
-  }
-  const testnet = process.env.NEXT_PUBLIC_TESTNET_RPC || "http://localhost:8545";
+  const testnet =
+    process.env.NEXT_PUBLIC_TESTNET_RPC || PUBLIC_TESTNET_RPC;
   const mainnet =
-    process.env.NEXT_PUBLIC_MAINNET_RPC || process.env.NEXT_PUBLIC_TESTNET_RPC || "http://localhost:8545";
-  return network === "testnet" ? testnet.replace(/\/$/, "") : mainnet.replace(/\/$/, "");
+    process.env.NEXT_PUBLIC_MAINNET_RPC ||
+    process.env.NEXT_PUBLIC_TESTNET_RPC ||
+    PUBLIC_TESTNET_RPC;
+  const url = network === "testnet" ? testnet : mainnet;
+  return url.replace(/\/$/, "");
 }

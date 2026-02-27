@@ -34,9 +34,9 @@ export function NetworkStatusBanner() {
       aria-live="polite"
       className="border-b border-amber-500/40 bg-amber-950/30 px-4 py-3 text-center text-sm text-amber-200"
     >
-      <strong>Testnet RPC unavailable.</strong>{" "}
-      The Boing Network may be starting up or nodes are not yet deployed. Run
-      boing-node locally, or check back when the incentivized testnet launches.
+      <strong>RPC unavailable.</strong>{" "}
+      Unable to reach the Boing Network RPC. The network may be starting up, or
+      requests may be blocked (e.g. CORS). Check the console for details.
       <a
         href="/about"
         className="ml-2 font-medium text-amber-100 hover:text-amber-50 underline underline-offset-2"

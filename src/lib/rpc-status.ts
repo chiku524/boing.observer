@@ -12,6 +12,8 @@ export function isRpcUnreachableError(error: unknown): boolean {
     lower.includes("network error") ||
     lower.includes("load failed") ||
     lower.includes("network request failed") ||
+    lower.includes("cors") ||
+    lower.includes("cross-origin") ||
     lower.includes("connection refused") ||
     lower.includes("econnrefused") ||
     lower.includes("enotfound") ||
@@ -26,10 +28,7 @@ export function isRpcUnreachableError(error: unknown): boolean {
 
 const NODES_UNAVAILABLE_MESSAGE =
   "Boing Network nodes are not yet available for this network. " +
-  "Run boing-node locally, or check back when the incentivized testnet launches.";
-
-const LOCALHOST_TIP =
-  " Make sure boing-node is running on port 8545 (e.g. http://localhost:8545).";
+  "The RPC may be unreachable or CORS may be blocking requests.";
 
 /**
  * Returns a user-friendly message for RPC errors.
@@ -44,16 +43,7 @@ export function getFriendlyRpcErrorMessage(
   const msg = error instanceof Error ? error.message : String(error);
 
   if (isRpcUnreachableError(error)) {
-    const rpcUrl =
-      typeof window !== "undefined"
-        ? process.env[`NEXT_PUBLIC_${network === "testnet" ? "TESTNET" : "MAINNET"}_RPC`]
-        : undefined;
-    const isLocalhost =
-      !rpcUrl || rpcUrl.includes("localhost") || rpcUrl.includes("127.0.0.1");
-    return (
-      NODES_UNAVAILABLE_MESSAGE +
-      (isLocalhost ? LOCALHOST_TIP : "")
-    );
+    return NODES_UNAVAILABLE_MESSAGE;
   }
 
   switch (context) {
