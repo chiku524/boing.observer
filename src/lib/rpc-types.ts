@@ -96,6 +96,36 @@ export interface Account {
   stake: string;
 }
 
+/**
+ * Safely convert any RPC value (string, number, byte array, object) to a hex string
+ * for display and URLs. Handles null/undefined and non-string serializations.
+ */
+export function toSafeHexString(value: unknown): string {
+  if (value == null) return "";
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number") return value.toString(16);
+  // Byte array from RPC (e.g. AccountId as [u8; 32])
+  if (Array.isArray(value) && value.every((n) => typeof n === "number")) {
+    return "0x" + value.map((n) => n.toString(16).padStart(2, "0")).join("");
+  }
+  if (ArrayBuffer.isView(value)) {
+    const view = value as Uint8Array;
+    return "0x" + Array.from(view)
+      .map((n) => n.toString(16).padStart(2, "0"))
+      .join("");
+  }
+  return String(value).trim();
+}
+
+/**
+ * Normalize hex for links: strip 0x and return lowercase. Safe for any RPC value.
+ */
+export function hexForLink(value: unknown): string {
+  const s = toSafeHexString(value);
+  const h = s.startsWith("0x") ? s.slice(2) : s;
+  return h.toLowerCase();
+}
+
 /** Normalize address to 64 hex chars (no 0x) for links and display. */
 export function normalizeAddress(addr: string): string {
   const hex = addr.startsWith("0x") ? addr.slice(2) : addr;
@@ -115,9 +145,10 @@ export function formatBalance(raw: string, decimals: number = DECIMALS): string 
   return fracPart ? `${intPart}.${fracPart}` : intPart;
 }
 
-/** Shorten hash/address for display (first 10 + ... + last 8). */
-export function shortenHash(hash: string, head = 10, tail = 8): string {
-  const h = hash.startsWith("0x") ? hash.slice(2) : hash;
-  if (h.length <= head + tail) return hash;
+/** Shorten hash/address for display (first 10 + ... + last 8). Accepts any value; safely coerces. */
+export function shortenHash(hash: unknown, head = 10, tail = 8): string {
+  const s = toSafeHexString(hash);
+  const h = s.startsWith("0x") ? s.slice(2) : s;
+  if (h.length <= head + tail) return s || "—";
   return `${h.slice(0, head)}…${h.slice(-tail)}`;
 }

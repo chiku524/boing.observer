@@ -6,14 +6,15 @@ import Link from "next/link";
 import { useNetwork } from "@/context/network-context";
 import { fetchBlockByHeight } from "@/lib/rpc-methods";
 import type { Block, BlockTransaction } from "@/lib/rpc-types";
-import { shortenHash, formatBalance } from "@/lib/rpc-types";
+import { shortenHash, formatBalance, hexForLink } from "@/lib/rpc-types";
 import { getTxPayloadKind, getTxPayloadSummary } from "@/lib/tx-payload";
 import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
+import { CopyButton } from "@/components/copy-button";
 
 function TxRow({ tx, index, network }: { tx: BlockTransaction; index: number; network: string }) {
   const kind = getTxPayloadKind(tx.payload);
   const summary = getTxPayloadSummary(tx.payload);
-  const sender = typeof tx.sender === "string" ? (tx.sender.startsWith("0x") ? tx.sender.slice(2) : tx.sender) : "";
+  const sender = hexForLink(tx.sender);
 
   return (
     <tr className="border-b border-[var(--border-color)]/60 hover:bg-white/5">
@@ -76,13 +77,9 @@ export default function BlockByHeightPage() {
     );
   }
 
-  const proposerHex = block?.header?.proposer != null
-    ? (String(block.header.proposer).startsWith("0x") ? String(block.header.proposer).slice(2) : String(block.header.proposer))
-    : "";
-  const parentHash = block?.header?.parent_hash != null
-    ? (String(block.header.parent_hash).startsWith("0x") ? String(block.header.parent_hash).slice(2) : String(block.header.parent_hash))
-    : "";
-  const blockHash = block?.hash ? (block.hash.startsWith("0x") ? block.hash.slice(2) : block.hash) : "";
+  const proposerHex = block ? hexForLink(block.header.proposer) : "";
+  const parentHash = block ? hexForLink(block.header.parent_hash) : "";
+  const blockHash = block ? hexForLink(block.hash) : "";
 
   return (
     <div className="space-y-6">
@@ -92,7 +89,13 @@ export default function BlockByHeightPage() {
         Block #{height.toLocaleString()}
       </h1>
 
-      {loading && <p className="text-[var(--text-muted)]">Loading…</p>}
+      {loading && (
+        <div className="space-y-4 animate-pulse" aria-busy="true">
+          <div className="h-8 bg-white/5 rounded w-48" />
+          <div className="h-64 bg-white/5 rounded" />
+          <div className="h-48 bg-white/5 rounded" />
+        </div>
+      )}
       {error && <p className="text-amber-300" role="alert">{error}</p>}
       {!loading && !error && !block && <p className="text-[var(--text-muted)]">Block not found.</p>}
 
@@ -101,14 +104,19 @@ export default function BlockByHeightPage() {
           <div className="glass-card p-6 space-y-4">
             <h2 className="font-display text-lg font-semibold text-[var(--text-primary)]">Header</h2>
             <dl className="grid gap-2 text-sm">
-              <div className="flex flex-wrap gap-x-2">
+              <div className="flex flex-wrap gap-x-2 items-center gap-y-1">
                 <dt className="text-[var(--text-muted)]">Hash</dt>
-                <dd className="hash text-[var(--text-secondary)]">
-                  {block.hash ? (
-                    <Link href={`/block/hash/${blockHash}?network=${network}`} className="text-network-cyan hover:underline">
-                      {block.hash}
-                    </Link>
-                  ) : "—"}
+                <dd className="hash text-[var(--text-secondary)] flex items-center gap-2 flex-wrap">
+                  {blockHash ? (
+                    <>
+                      <Link href={`/block/hash/${blockHash}?network=${network}`} className="text-network-cyan hover:underline">
+                        {shortenHash(block.hash)}
+                      </Link>
+                      <CopyButton value={blockHash ? `0x${blockHash}` : ""} label="Copy hash" />
+                    </>
+                  ) : (
+                    "—"
+                  )}
                 </dd>
               </div>
               <div className="flex flex-wrap gap-x-2">
@@ -123,12 +131,19 @@ export default function BlockByHeightPage() {
                     : "—"}
                 </dd>
               </div>
-              <div className="flex flex-wrap gap-x-2">
+              <div className="flex flex-wrap gap-x-2 items-center gap-y-1">
                 <dt className="text-[var(--text-muted)]">Proposer</dt>
-                <dd>
-                  <Link href={`/account/${proposerHex}?network=${network}`} className="address-link">
-                    {block.header.proposer != null ? String(block.header.proposer) : "—"}
-                  </Link>
+                <dd className="flex items-center gap-2 flex-wrap">
+                  {proposerHex ? (
+                    <>
+                      <Link href={`/account/${proposerHex}?network=${network}`} className="address-link">
+                        {shortenHash(block.header.proposer)}
+                      </Link>
+                      <CopyButton value={proposerHex ? `0x${proposerHex}` : ""} label="Copy address" />
+                    </>
+                  ) : (
+                    "—"
+                  )}
                 </dd>
               </div>
               <div className="flex flex-wrap gap-x-2">

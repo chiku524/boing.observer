@@ -6,14 +6,15 @@ import Link from "next/link";
 import { useNetwork } from "@/context/network-context";
 import { fetchBlockByHash } from "@/lib/rpc-methods";
 import type { Block, BlockTransaction } from "@/lib/rpc-types";
-import { shortenHash } from "@/lib/rpc-types";
+import { shortenHash, hexForLink } from "@/lib/rpc-types";
 import { getTxPayloadKind, getTxPayloadSummary } from "@/lib/tx-payload";
 import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
+import { CopyButton } from "@/components/copy-button";
 
 function TxRow({ tx, index, network }: { tx: BlockTransaction; index: number; network: string }) {
   const kind = getTxPayloadKind(tx.payload);
   const summary = getTxPayloadSummary(tx.payload);
-  const sender = typeof tx.sender === "string" ? (tx.sender.startsWith("0x") ? tx.sender.slice(2) : tx.sender) : "";
+  const sender = hexForLink(tx.sender);
 
   return (
     <tr className="border-b border-[var(--border-color)]/60 hover:bg-white/5">
@@ -75,12 +76,8 @@ export default function BlockByHashPage() {
     );
   }
 
-  const proposerHex = block?.header?.proposer != null
-    ? (String(block.header.proposer).startsWith("0x") ? String(block.header.proposer).slice(2) : String(block.header.proposer))
-    : "";
-  const parentHash = block?.header?.parent_hash != null
-    ? (String(block.header.parent_hash).startsWith("0x") ? String(block.header.parent_hash).slice(2) : String(block.header.parent_hash))
-    : "";
+  const proposerHex = block ? hexForLink(block.header.proposer) : "";
+  const parentHash = block ? hexForLink(block.header.parent_hash) : "";
 
   return (
     <div className="space-y-6">
@@ -89,9 +86,18 @@ export default function BlockByHashPage() {
       <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
         Block by hash
       </h1>
-      <p className="hash text-sm text-[var(--text-muted)] break-all">{hash}</p>
+      <div className="flex items-center gap-2 flex-wrap">
+        <p className="hash text-sm text-[var(--text-muted)] break-all">{hash}</p>
+        <CopyButton value={`0x${hash}`} label="Copy hash" />
+      </div>
 
-      {loading && <p className="text-[var(--text-muted)]">Loading…</p>}
+      {loading && (
+        <div className="space-y-4 animate-pulse" aria-busy="true">
+          <div className="h-8 bg-white/5 rounded w-48" />
+          <div className="h-64 bg-white/5 rounded" />
+          <div className="h-48 bg-white/5 rounded" />
+        </div>
+      )}
       {error && <p className="text-amber-300" role="alert">{error}</p>}
       {!loading && !error && !block && <p className="text-[var(--text-muted)]">Block not found.</p>}
 
@@ -120,12 +126,19 @@ export default function BlockByHashPage() {
                     : "—"}
                 </dd>
               </div>
-              <div className="flex flex-wrap gap-x-2">
+              <div className="flex flex-wrap gap-x-2 items-center gap-y-1">
                 <dt className="text-[var(--text-muted)]">Proposer</dt>
-                <dd>
-                  <Link href={`/account/${proposerHex}?network=${network}`} className="address-link">
-                    {block.header.proposer != null ? String(block.header.proposer) : "—"}
-                  </Link>
+                <dd className="flex items-center gap-2 flex-wrap">
+                  {proposerHex ? (
+                    <>
+                      <Link href={`/account/${proposerHex}?network=${network}`} className="address-link">
+                        {shortenHash(block.header.proposer)}
+                      </Link>
+                      <CopyButton value={`0x${proposerHex}`} label="Copy address" />
+                    </>
+                  ) : (
+                    "—"
+                  )}
                 </dd>
               </div>
               <div className="flex flex-wrap gap-x-2">

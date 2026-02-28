@@ -9,7 +9,7 @@ import { NetworkCharts } from "@/components/network-charts";
 import { fetchChainHeight, fetchBlockByHeight } from "@/lib/rpc-methods";
 import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
 import type { Block } from "@/lib/rpc-types";
-import { shortenHash } from "@/lib/rpc-types";
+import { shortenHash, hexForLink } from "@/lib/rpc-types";
 
 export default function HomePage() {
   const { network } = useNetwork();
@@ -80,7 +80,7 @@ export default function HomePage() {
           Chain tip
         </h2>
         {loading ? (
-          <p className="mt-2 text-[var(--text-muted)]">Loading…</p>
+          <div className="mt-2 h-8 w-48 bg-white/5 rounded animate-pulse" aria-busy="true" />
         ) : height !== null ? (
           <p className="mt-2 font-mono text-lg text-network-cyan">
             Current height: <span className="font-semibold">{height.toLocaleString()}</span>
@@ -93,7 +93,16 @@ export default function HomePage() {
           Latest blocks
         </h2>
         {loading ? (
-          <p className="mt-2 text-[var(--text-muted)]">Loading…</p>
+          <div className="mt-4 space-y-2" aria-busy="true">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-12 bg-white/5 rounded animate-pulse" />
+            ))}
+          </div>
+        ) : blocks.length === 0 && !error ? (
+          <div className="mt-4 glass-card p-8 text-center text-[var(--text-muted)]">
+            <p>No blocks yet. The chain may be starting or RPC returned no data.</p>
+            <p className="mt-2 text-sm">Try switching networks or refreshing.</p>
+          </div>
         ) : (
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-[600px] border-collapse">
@@ -107,9 +116,12 @@ export default function HomePage() {
                 </tr>
               </thead>
               <tbody>
-                {blocks.map((b) => (
+                {blocks.map((b) => {
+                  const hashStr = hexForLink(b.hash);
+                  const proposerStr = hexForLink(b.header.proposer);
+                  return (
                   <tr
-                    key={b.hash}
+                    key={hashStr || b.header.height}
                     className="border-b border-[var(--border-color)]/60 hover:bg-white/5 transition-colors"
                   >
                     <td className="py-3 pr-4">
@@ -122,18 +134,18 @@ export default function HomePage() {
                     </td>
                     <td className="py-3 pr-4">
                       <Link
-                        href={`/block/hash/${b.hash.startsWith("0x") ? b.hash.slice(2) : b.hash}?network=${network}`}
+                        href={`/block/hash/${hashStr}?network=${network}`}
                         className="hash text-[var(--text-secondary)] hover:text-network-primary-light"
                       >
-                        {shortenHash(b.hash)}
+                        {shortenHash(hashStr)}
                       </Link>
                     </td>
                     <td className="py-3 pr-4">
                       <Link
-                        href={`/account/${(b.header.proposer || "").startsWith("0x") ? (b.header.proposer as string).slice(2) : b.header.proposer}?network=${network}`}
+                        href={`/account/${proposerStr}?network=${network}`}
                         className="hash text-network-cyan hover:underline"
                       >
-                        {shortenHash(String(b.header.proposer))}
+                        {shortenHash(proposerStr)}
                       </Link>
                     </td>
                     <td className="py-3 pr-4 font-mono text-sm">
@@ -145,7 +157,8 @@ export default function HomePage() {
                         : "—"}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

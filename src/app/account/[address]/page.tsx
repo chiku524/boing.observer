@@ -6,8 +6,9 @@ import Link from "next/link";
 import { useNetwork } from "@/context/network-context";
 import { fetchAccount } from "@/lib/rpc-methods";
 import type { Account } from "@/lib/rpc-types";
-import { normalizeAddress, formatBalance, shortenHash } from "@/lib/rpc-types";
+import { normalizeAddress, formatBalance } from "@/lib/rpc-types";
 import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
+import { CopyButton } from "@/components/copy-button";
 
 export default function AccountPage() {
   const params = useParams();
@@ -59,11 +60,19 @@ export default function AccountPage() {
       <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
         Account
       </h1>
-      <p className="hash text-sm text-[var(--text-muted)] break-all" title={address}>
-        {address}
-      </p>
+      <div className="flex items-center gap-2 flex-wrap">
+        <p className="hash text-sm text-[var(--text-muted)] break-all font-mono" title={address}>
+          0x{address}
+        </p>
+        <CopyButton value={`0x${address}`} label="Copy address" />
+      </div>
 
-      {loading && <p className="text-[var(--text-muted)]">Loading…</p>}
+      {loading && (
+        <div className="space-y-4 animate-pulse" aria-busy="true">
+          <div className="h-8 bg-white/5 rounded w-32" />
+          <div className="h-24 bg-white/5 rounded" />
+        </div>
+      )}
       {error && <p className="text-amber-300" role="alert">{error}</p>}
 
       {!loading && !error && account && (

@@ -4,6 +4,7 @@
  */
 
 import type { TxPayloadKind } from "./rpc-types";
+import { toSafeHexString } from "./rpc-types";
 
 export function getTxPayloadKind(payload: unknown): TxPayloadKind {
   if (!payload || typeof payload !== "object") return "Unknown";
@@ -33,13 +34,13 @@ export function getTxPayloadSummary(payload: unknown): string {
   const p = payload as Record<string, unknown>;
   switch (kind) {
     case "Transfer":
-      return `to ${formatShortAddr(String(p.to))} · ${formatAmount(String(p.amount))} BOING`;
+      return `to ${formatShortAddr(p.to)} · ${formatAmount(String(p.amount ?? ""))} BOING`;
     case "Bond":
       return `${formatAmount(String(p.amount))} BOING stake`;
     case "Unbond":
       return `unbond ${formatAmount(String(p.amount))} BOING`;
     case "ContractCall":
-      return `contract ${formatShortAddr(String(p.contract))}`;
+      return `contract ${formatShortAddr(p.contract)}`;
     case "ContractDeploy":
       return "deploy contract";
     case "ContractDeployWithPurpose":
@@ -49,9 +50,10 @@ export function getTxPayloadSummary(payload: unknown): string {
   }
 }
 
-function formatShortAddr(hex: string): string {
-  const h = hex.startsWith("0x") ? hex.slice(2) : hex;
-  return h.length > 12 ? `${h.slice(0, 6)}…${h.slice(-4)}` : h;
+function formatShortAddr(value: unknown): string {
+  const s = toSafeHexString(value);
+  const h = s.startsWith("0x") ? s.slice(2) : s;
+  return h.length > 12 ? `${h.slice(0, 6)}…${h.slice(-4)}` : h || "—";
 }
 
 function formatPurpose(cat: string): string {
