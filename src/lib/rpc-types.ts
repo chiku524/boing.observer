@@ -25,10 +25,6 @@ export interface JsonRpcError {
 
 export type JsonRpcResponse<T> = JsonRpcSuccess<T> | JsonRpcError;
 
-export function isJsonRpcError<T>(r: JsonRpcResponse<T>): r is JsonRpcError {
-  return "error" in r;
-}
-
 /** Block header as returned by node (hex or number per node serialization). */
 export interface BlockHeader {
   parent_hash: string;
@@ -84,10 +80,6 @@ export interface Block {
   hash: string;
   header: BlockHeader;
   transactions: BlockTransaction[];
-}
-
-export interface AccountBalance {
-  balance: string;
 }
 
 export interface Account {

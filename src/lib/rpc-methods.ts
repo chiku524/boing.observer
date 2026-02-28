@@ -3,7 +3,7 @@
  */
 
 import { rpcCall, getRpcBaseUrl } from "./rpc-client";
-import type { Block, Account, AccountBalance } from "./rpc-types";
+import type { Block, Account } from "./rpc-types";
 
 export type NetworkId = "testnet" | "mainnet";
 
@@ -27,15 +27,6 @@ export async function fetchBlockByHash(
   const base = getRpcBaseUrl(network);
   const hash = hexBlockHash.startsWith("0x") ? hexBlockHash : `0x${hexBlockHash}`;
   return rpcCall<Block | null>(base, "boing_getBlockByHash", [hash]);
-}
-
-export async function fetchBalance(
-  network: NetworkId,
-  hexAccountId: string
-): Promise<AccountBalance> {
-  const base = getRpcBaseUrl(network);
-  const id = hexAccountId.startsWith("0x") ? hexAccountId : `0x${hexAccountId}`;
-  return rpcCall<AccountBalance>(base, "boing_getBalance", [id]);
 }
 
 export async function fetchAccount(

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useNetwork } from "@/context/network-context";
+import { DOCS_BASE } from "@/lib/constants";
 import { qaCheck, type QaCheckResult } from "@/lib/rpc-methods";
 import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
 
@@ -147,7 +148,7 @@ export default function QaCheckPage() {
           {result.result === "reject" && (
             <p className="mt-3 text-sm">
               <a
-                href="https://github.com/boing-network/boing.network/blob/main/docs/QA-PASS-GUIDE.md"
+                href={`${DOCS_BASE}/QA-PASS-GUIDE.md`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-network-cyan hover:underline"
@@ -165,7 +166,7 @@ export default function QaCheckPage() {
         </p>
         <p>
           <a
-            href="https://github.com/boing-network/boing.network/blob/main/docs/QA-PASS-GUIDE.md"
+            href={`${DOCS_BASE}/QA-PASS-GUIDE.md`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-network-cyan hover:underline"
@@ -174,7 +175,7 @@ export default function QaCheckPage() {
           </a>{" "}
           ·{" "}
           <a
-            href="https://github.com/boing-network/boing.network/blob/main/docs/CANONICAL-MALICE-DEFINITION.md"
+            href={`${DOCS_BASE}/CANONICAL-MALICE-DEFINITION.md`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-network-cyan hover:underline"

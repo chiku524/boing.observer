@@ -1,12 +1,12 @@
 "use client";
 
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useNetwork } from "@/context/network-context";
 import { fetchBlockByHeight } from "@/lib/rpc-methods";
 import type { Block, BlockTransaction } from "@/lib/rpc-types";
-import { shortenHash, formatBalance, hexForLink } from "@/lib/rpc-types";
+import { shortenHash, hexForLink } from "@/lib/rpc-types";
 import { getTxPayloadKind, getTxPayloadSummary } from "@/lib/tx-payload";
 import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
 import { CopyButton } from "@/components/copy-button";
@@ -36,7 +36,6 @@ function TxRow({ tx, index, network }: { tx: BlockTransaction; index: number; ne
 
 export default function BlockByHeightPage() {
   const params = useParams();
-  const searchParams = useSearchParams();
   const { network } = useNetwork();
   const heightParam = params?.height as string;
   const height = heightParam ? parseInt(heightParam, 10) : NaN;

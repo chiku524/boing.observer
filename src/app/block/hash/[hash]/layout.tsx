@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-
-const SITE_URL = "https://boing.observer";
+import { SITE_URL } from "@/lib/constants";
 
 type Props = {
   params: Promise<{ hash: string }>;

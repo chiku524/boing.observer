@@ -3,8 +3,7 @@ import "./globals.css";
 import { NetworkProvider } from "@/context/network-context";
 import { Header } from "@/components/header";
 import { NetworkStatusBanner } from "@/components/network-status-banner";
-
-const SITE_URL = "https://boing.observer";
+import { SITE_URL } from "@/lib/constants";
 
 // Verification codes from Google Search Console, Bing Webmaster Tools, etc.
 // Set in env: NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION, NEXT_PUBLIC_BING_SITE_VERIFICATION

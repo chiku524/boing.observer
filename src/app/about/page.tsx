@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-
-const SITE_URL = "https://boing.observer";
-const DOCS_BASE =
-  "https://github.com/boing-network/boing.network/blob/main/docs";
+import { SITE_URL, DOCS_BASE } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "About",
