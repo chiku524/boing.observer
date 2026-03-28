@@ -5,7 +5,7 @@
  * Transient failures (network error, 5xx, 429) are retried once after a short delay.
  */
 
-import type { JsonRpcRequest, JsonRpcResponse } from "./rpc-types";
+import type { JsonRpcRequest, JsonRpcResponse, NetworkId } from "./rpc-types";
 
 const PUBLIC_TESTNET_RPC = "https://testnet-rpc.boing.network";
 
@@ -23,6 +23,7 @@ function isRetryable(error: unknown, res?: Response): boolean {
 }
 
 export async function rpcCall<T>(
+  network: NetworkId,
   baseUrl: string,
   method: string,
   params: unknown[] = [],
@@ -35,17 +36,28 @@ export async function rpcCall<T>(
     params,
   };
 
+  const useSameOriginProxy = typeof window !== "undefined";
+
   let res: Response;
   try {
-    res = await fetch(baseUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(req),
-    });
+    res = useSameOriginProxy
+      ? await fetch("/api/rpc", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Boing-RPC-Network": network,
+          },
+          body: JSON.stringify(req),
+        })
+      : await fetch(baseUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(req),
+        });
   } catch (err) {
     if (!isRetry && isRetryable(err)) {
       await new Promise((r) => setTimeout(r, RPC_RETRY_DELAY_MS));
-      return rpcCall<T>(baseUrl, method, params, true);
+      return rpcCall<T>(network, baseUrl, method, params, true);
     }
     throw err;
   }
@@ -53,7 +65,7 @@ export async function rpcCall<T>(
   if (!res.ok) {
     if (!isRetry && isRetryable(null, res)) {
       await new Promise((r) => setTimeout(r, RPC_RETRY_DELAY_MS));
-      return rpcCall<T>(baseUrl, method, params, true);
+      return rpcCall<T>(network, baseUrl, method, params, true);
     }
     throw new Error(`RPC HTTP ${res.status}: ${res.statusText}`);
   }

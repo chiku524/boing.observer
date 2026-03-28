@@ -35,7 +35,7 @@ function cachedRpc<T>(key: string, ttlMs: number, loader: () => Promise<T>): Pro
 export async function fetchChainHeight(network: NetworkId): Promise<number> {
   const base = getRpcBaseUrl(network);
   return cachedRpc(`${base}:boing_chainHeight`, 5_000, () =>
-    rpcCall<number>(base, "boing_chainHeight", [])
+    rpcCall<number>(network, base, "boing_chainHeight", [])
   );
 }
 
@@ -45,7 +45,7 @@ export async function fetchBlockByHeight(
 ): Promise<Block | null> {
   const base = getRpcBaseUrl(network);
   return cachedRpc(`${base}:boing_getBlockByHeight:${height}`, 10_000, () =>
-    rpcCall<Block | null>(base, "boing_getBlockByHeight", [height])
+    rpcCall<Block | null>(network, base, "boing_getBlockByHeight", [height])
   );
 }
 
@@ -56,7 +56,7 @@ export async function fetchBlockByHash(
   const base = getRpcBaseUrl(network);
   const hash = hexBlockHash.startsWith("0x") ? hexBlockHash : `0x${hexBlockHash}`;
   return cachedRpc(`${base}:boing_getBlockByHash:${hash}`, 10_000, () =>
-    rpcCall<Block | null>(base, "boing_getBlockByHash", [hash])
+    rpcCall<Block | null>(network, base, "boing_getBlockByHash", [hash])
   );
 }
 
@@ -67,7 +67,7 @@ export async function fetchAccount(
   const base = getRpcBaseUrl(network);
   const id = hexAccountId.startsWith("0x") ? hexAccountId : `0x${hexAccountId}`;
   return cachedRpc(`${base}:boing_getAccount:${id}`, 10_000, () =>
-    rpcCall<Account>(base, "boing_getAccount", [id])
+    rpcCall<Account>(network, base, "boing_getAccount", [id])
   );
 }
 
@@ -100,7 +100,7 @@ export async function qaCheck(
       }
     }
   }
-  return rpcCall<QaCheckResult>(base, "boing_qaCheck", params);
+  return rpcCall<QaCheckResult>(network, base, "boing_qaCheck", params);
 }
 
 export interface FaucetResult {
@@ -116,5 +116,5 @@ export async function faucetRequest(
 ): Promise<FaucetResult> {
   const base = getRpcBaseUrl(network);
   const id = hexAccountId.startsWith("0x") ? hexAccountId : `0x${hexAccountId}`;
-  return rpcCall<FaucetResult>(base, "boing_faucetRequest", [id]);
+  return rpcCall<FaucetResult>(network, base, "boing_faucetRequest", [id]);
 }
