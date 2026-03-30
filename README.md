@@ -86,9 +86,10 @@ This project is set up to deploy to **Cloudflare Workers** using the [OpenNext C
    npx wrangler login
    ```
 
-2. Set production RPC URLs (for the Worker’s runtime). Either:
+2. Set production env (for the Worker’s runtime). Either:
    - Add `NEXT_PUBLIC_TESTNET_RPC` and `NEXT_PUBLIC_MAINNET_RPC` in **Cloudflare Dashboard** → Workers & Pages → your Worker → Settings → Variables, or  
    - Use [Wrangler secrets](https://developers.cloudflare.com/workers/configuration/secrets/) if you prefer CLI.
+   - Optional: `NEXT_PUBLIC_BOING_PROTOCOL_DOCS_REPO` = `owner/repo` for GitHub links on `/qa` (defaults to `chiku524/boing.network` if unset).
 
 3. Build and deploy:
 
@@ -163,11 +164,9 @@ NEXT_PUBLIC_BING_SITE_VERIFICATION=your-bing-code
 
 ## Reference
 
-- **RPC spec:** `boing-network/docs/RPC-API-SPEC.md`
-- **QA rules:** `boing-network/docs/QUALITY-ASSURANCE-NETWORK.md`
+- **RPC spec / QA docs:** linked from the app using `NEXT_PUBLIC_BOING_PROTOCOL_DOCS_REPO` (default `chiku524/boing.network` on `main` under `docs/`).
 - **Wallet/auth alignment:** See [HANDOFF.md](HANDOFF.md) (sync review and wallet integration notes).
-- **Design system:** `boing-network/docs/BOING-DESIGN-SYSTEM.md`
-- **Explorer prompt:** `boing-network/docs/BOING-OBSERVER-EXPLORER-PROMPT.md`
+- **Design system / explorer prompt:** under `docs/` in the same GitHub repo as above (see boing.network monorepo).
 
 ---
 

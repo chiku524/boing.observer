@@ -324,7 +324,7 @@ This section records the concrete sync pass performed against the current `boing
 
 - The explorer still contains its own faucet helper route for advanced/direct RPC use.
 - The explorer does not implement wallet connect today; future account-aware features should reuse the provider and auth contract in `boing.network/docs/WALLET-CONNECTION-AND-SIGNIN.md` and `PORTAL-WALLET-AUTH-ROLLOUT.md`.
-- A shared cross-app metadata/config source is still recommended (see [THREE-CODEBASE-ALIGNMENT.md](https://github.com/boing-network/boing.network/blob/main/docs/THREE-CODEBASE-ALIGNMENT.md) in boing.network).
+- A shared cross-app metadata/config source is still recommended (see [THREE-CODEBASE-ALIGNMENT.md](https://github.com/chiku524/boing.network/blob/main/docs/THREE-CODEBASE-ALIGNMENT.md) in boing.network).
 
 ---
 
