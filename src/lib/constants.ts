@@ -30,6 +30,13 @@ export const CANONICAL_QA_POOL_CONFIG_JSON_URL = `${DOCS_RAW_BASE}/config/qa_poo
 /** Explains canonical vs live QA config and links to RPC. */
 export const CANONICAL_QA_DOC_URL = `${DOCS_BASE}/config/CANONICAL-QA-REGISTRY.md`;
 
+/**
+ * Local VibeMiner / localhost:8545 vs public testnet RPC — same Method not found, different backends.
+ * (Boing repo THREE-CODEBASE-ALIGNMENT §2.1; use chiku524 fork URL so the anchor matches mainline doc path.)
+ */
+export const QA_RPC_TWO_SURFACES_DOC_URL =
+  "https://github.com/chiku524/boing.network/blob/main/docs/THREE-CODEBASE-ALIGNMENT.md#21-qa-registry-rpc-boing_getqaregistry--two-different-surfaces";
+
 /** Canonical public faucet page on boing.network. */
 export const NETWORK_FAUCET_URL = `${WEBSITE_URL}/faucet`;
 

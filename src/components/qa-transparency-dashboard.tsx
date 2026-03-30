@@ -9,6 +9,7 @@ import {
   CANONICAL_QA_POOL_CONFIG_JSON_URL,
   CANONICAL_QA_REGISTRY_JSON_URL,
   QA_DOC_URL,
+  QA_RPC_TWO_SURFACES_DOC_URL,
   RPC_SPEC_URL,
 } from "@/lib/constants";
 import { fetchQaPoolConfig, fetchQaPoolList, fetchQaRegistry } from "@/lib/rpc-methods";
@@ -101,8 +102,7 @@ export function QaTransparencyDashboard() {
       } else {
         setRegistry(null);
         setRegistryError(
-          `${getFriendlyRpcErrorMessage(regRes.reason, network, "general")} If the node is older than the release with ` +
-            `\`boing_getQaRegistry\`, upgrade the RPC or compare against the canonical JSON in docs instead.`
+          `${getFriendlyRpcErrorMessage(regRes.reason, network, "general")} Upgrade the configured RPC for this network (e.g. public testnet) to a boing-node that implements boing_getQaRegistry, or use the canonical JSON links above.`
         );
       }
 
@@ -240,7 +240,21 @@ export function QaTransparencyDashboard() {
 
         {registryError && (
           <div className="rounded-lg border border-amber-500/40 bg-amber-950/25 p-4 text-sm text-amber-100" role="status">
-            <strong className="text-amber-200">Registry RPC:</strong> {registryError}
+            <p>
+              <strong className="text-amber-200">Registry RPC:</strong> {registryError}
+            </p>
+            <p className="mt-3 text-xs leading-relaxed text-amber-100/85">
+              This page calls the explorer&apos;s RPC URL (not <span className="font-mono">localhost</span> from VibeMiner).
+              Updating your local node alone does not change boing.observer until the public endpoint is upgraded.{" "}
+              <a
+                href={QA_RPC_TWO_SURFACES_DOC_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-network-cyan underline-offset-2 hover:underline"
+              >
+                Local vs public RPC — Boing docs §2.1
+              </a>
+            </p>
           </div>
         )}
 
