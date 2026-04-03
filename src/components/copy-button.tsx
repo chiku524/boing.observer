@@ -34,7 +34,7 @@ export function CopyButton({ value, label = "Copy", className = "" }: CopyButton
     <button
       type="button"
       onClick={handleCopy}
-      className={`inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-network-cyan/50 ${
+      className={`inline-flex min-h-11 items-center gap-1.5 rounded px-3 py-2 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-network-cyan/50 sm:min-h-0 sm:px-2 sm:py-1 ${
         copied
           ? "bg-green-500/20 text-green-300"
           : "bg-white/5 text-[var(--text-muted)] hover:bg-white/10 hover:text-[var(--text-secondary)]"

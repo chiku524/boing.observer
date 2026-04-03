@@ -19,6 +19,8 @@ const config: Config = {
           "primary-light": "#a78bfa",
           cyan: "#06b6d4",
           "cyan-light": "#22d3ee",
+          aurora: "#0ea5e9",
+          nebula: "#c026d3",
           gold: "#fbbf24",
         },
       },

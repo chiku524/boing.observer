@@ -57,7 +57,7 @@ export default function BlockByHashPage() {
     <div className="space-y-6">
       <Link href="/" className="text-network-cyan hover:underline text-sm">← Home</Link>
 
-      <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
+      <h1 className="font-display text-xl font-bold text-[var(--text-primary)] sm:text-2xl">
         Block by hash
       </h1>
       <p className="text-sm text-[var(--text-muted)] -mt-2">

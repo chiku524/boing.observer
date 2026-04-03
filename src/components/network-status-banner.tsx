@@ -32,7 +32,7 @@ export function NetworkStatusBanner() {
     <div
       role="alert"
       aria-live="polite"
-      className="border-b border-amber-500/40 bg-amber-950/30 px-4 py-3 text-center text-sm text-amber-200"
+      className="border-b border-amber-500/40 bg-amber-950/30 px-3 py-3 text-center text-xs text-amber-200 sm:px-4 sm:text-sm"
     >
       <strong>RPC unavailable.</strong>{" "}
       Unable to reach the Boing Network RPC. The network may be starting up, or

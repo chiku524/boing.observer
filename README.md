@@ -14,7 +14,7 @@ Blockchain explorer for **Boing Network** at **boing.observer**. Browse blocks, 
 
 ## Tech stack
 
-- **Next.js 14** (App Router), React 18, TypeScript
+- **Next.js 15** (App Router), React 18, TypeScript
 - **Tailwind CSS** with Boing design tokens (Cosmic Foundation: dark theme, Orbitron/Inter/JetBrains Mono, glass cards)
 - **RPC** — Plain `fetch()` JSON-RPC 2.0 to Boing node (no SDK)
 - **Cloudflare** — Deploy via [OpenNext Cloudflare adapter](https://opennext.js.org/cloudflare) to Workers; custom domain **boing.observer**
@@ -48,11 +48,11 @@ Blockchain explorer for **Boing Network** at **boing.observer**. Browse blocks, 
 | Variable | Description |
 |----------|-------------|
 | `NEXT_PUBLIC_TESTNET_RPC` | Testnet RPC base URL (e.g. `https://testnet-rpc.boing.network/`). |
-| `NEXT_PUBLIC_MAINNET_RPC` | Mainnet RPC base URL. Leave unset until a real mainnet endpoint exists. |
+| `NEXT_PUBLIC_MAINNET_RPC` | Mainnet RPC base URL. **Leave unset** until a distinct mainnet endpoint is published — never set this to the testnet URL ([THREE-CODEBASE-ALIGNMENT.md](https://github.com/chiku524/boing.network/blob/main/docs/THREE-CODEBASE-ALIGNMENT.md)). |
 
 No API keys required for read-only RPC. Do not hardcode production RPC URLs in the repo; use `.env.local` or hosting env.
 
-Important: if `NEXT_PUBLIC_MAINNET_RPC` is unset, the explorer now keeps users on testnet instead of silently routing "mainnet" to the testnet RPC.
+Important: if `NEXT_PUBLIC_MAINNET_RPC` is unset or equals the testnet URL, the explorer keeps users on testnet and does not treat “mainnet” as live.
 
 ## Testnet launch readiness
 
@@ -64,7 +64,7 @@ For the Boing incentivized testnet launch, the following must be in place for th
 | **boing-node** | Required | Validators and full nodes must run `boing-node`; RPC on port 8545. |
 | **Genesis / chain ID** | Required | Chain must be live and producing blocks. |
 | **Faucet** | Recommended | Testnet BOING for validators and developers. |
-| **Explorer configured** | Ready | boing.observer uses env vars; update Cloudflare/GitHub secrets when RPC is live. |
+| **Explorer configured** | Ready | Set `NEXT_PUBLIC_TESTNET_RPC` in Cloudflare Worker variables or GitHub Actions **Variables** / **Secrets** (see [INFRASTRUCTURE-SETUP.md](https://github.com/chiku524/boing.network/blob/main/docs/INFRASTRUCTURE-SETUP.md)). |
 
 Until public RPC nodes are available, the explorer shows a friendly message: *"Boing Network nodes are not yet available"* and suggests running `boing-node` locally. When RPC is reachable, the status banner hides automatically.
 
@@ -74,7 +74,7 @@ This project is set up to deploy to **Cloudflare Workers** using the [OpenNext C
 
 ### Prerequisites
 
-- [Wrangler](https://developers.cloudflare.com/workers/wrangler/) (included as dev dependency; use v3.99+).
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/) (included as dev dependency; v4.x).
 - A Cloudflare account.
 - The domain **boing.observer** added to Cloudflare (DNS managed by Cloudflare).
 
@@ -110,7 +110,9 @@ This repo includes a GitHub Actions workflow that deploys on every push to `main
 
 1. **Create a Cloudflare API token** — [Cloudflare Dashboard](https://dash.cloudflare.com/) → **My Profile** → **API Tokens** → **Create Token** (use **Edit Cloudflare Workers** template).
 2. **Get your Account ID** — In Cloudflare Dashboard, select any domain; Account ID is in the right sidebar under **API**.
-3. **Add GitHub Secrets** — Repo → **Settings** → **Secrets and variables** → **Actions**. Add: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `NEXT_PUBLIC_TESTNET_RPC`, `NEXT_PUBLIC_MAINNET_RPC`.
+3. **Add GitHub credentials** — Repo → **Settings** → **Secrets and variables** → **Actions**:
+   - **Secrets (required):** `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
+   - **Variables (recommended for public RPC URLs):** `NEXT_PUBLIC_TESTNET_RPC` = `https://testnet-rpc.boing.network` or `https://testnet-rpc.boing.network/`; optional `NEXT_PUBLIC_MAINNET_RPC` only when mainnet RPC is live (must differ from testnet). The workflow uses **Variables first**, then **Secrets**, for those two `NEXT_PUBLIC_*` keys.
 4. **Attach custom domain** (first deploy) — **Workers & Pages** → **boing-observer** → **Settings** → **Domains & Routes** → add **boing.observer**.
 
 Pushes to `main` trigger deployment; see **Actions** tab for status.

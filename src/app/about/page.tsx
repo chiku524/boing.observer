@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_URL, DOCS_BASE, NETWORK_FAUCET_URL, QA_DOC_URL, RPC_SPEC_URL } from "@/lib/constants";
+import { SITE_URL, DOCS_BASE, QA_DOC_URL, RPC_SPEC_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "About",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "About Boing Network | Boing Observer",
     description:
-      "Six pillars: Security, Scalability, Decentralization, Authenticity, Transparency, True QA. Boing Network — Authentic. Decentralized. Optimal. Sustainable.",
+      "Six pillars: Security, Scalability, Decentralization, Authenticity, Transparency, True QA. Boing Network — Authentic. Decentralized. Optimal. Quality-Assured.",
   },
   alternates: {
     canonical: `${SITE_URL}/about`,
@@ -44,7 +44,7 @@ export default function AboutPage() {
           About Boing Network
         </h1>
         <p className="mt-2 text-[var(--text-secondary)]">
-          Boing Network — <em>Authentic. Decentralized. Optimal. Sustainable.</em>
+          Boing Network — <em>Authentic. Decentralized. Optimal. Quality-Assured.</em>
         </p>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
           Six pillars guide design and operations: Security, Scalability, Decentralization, Authenticity, Transparency, True Quality Assurance.
@@ -56,7 +56,7 @@ export default function AboutPage() {
           Six pillars
         </h2>
         <div className="space-y-6">
-          <div className="glass-card p-6">
+          <div className="glass-card p-5 sm:p-6">
             <h3 className="font-display font-semibold text-network-cyan mb-2">
               1. Security
             </h3>
@@ -74,7 +74,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="glass-card p-6">
+          <div className="glass-card p-5 sm:p-6">
             <h3 className="font-display font-semibold text-network-cyan mb-2">
               2. Scalability
             </h3>
@@ -83,7 +83,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="glass-card p-6">
+          <div className="glass-card p-5 sm:p-6">
             <h3 className="font-display font-semibold text-network-cyan mb-2">
               3. Decentralization
             </h3>
@@ -92,7 +92,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="glass-card p-6">
+          <div className="glass-card p-5 sm:p-6">
             <h3 className="font-display font-semibold text-network-cyan mb-2">
               4. Authenticity
             </h3>
@@ -101,7 +101,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="glass-card p-6">
+          <div className="glass-card p-5 sm:p-6">
             <h3 className="font-display font-semibold text-network-cyan mb-2">
               5. Transparency
             </h3>
@@ -112,7 +112,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="glass-card p-6">
+          <div className="glass-card p-5 sm:p-6">
             <h3 className="font-display font-semibold text-network-cyan mb-2">
               6. True quality assurance
             </h3>
@@ -138,58 +138,22 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="glass-card p-6">
+      <section className="glass-card p-5 sm:p-6">
         <h2 className="font-display text-xl font-semibold text-[var(--text-primary)] mb-4">
           Boing Observer
         </h2>
         <p className="text-[var(--text-secondary)] leading-relaxed">
-          Boing Observer is the official blockchain explorer for Boing Network. Search by block height, block hash, or account address. Browse Boing testnet today, with mainnet support enabled when a distinct mainnet RPC is configured. Use the{" "}
-          <Link href="/tools/qa-check" className="text-network-cyan hover:underline">QA Check</Link>{" "}
-          tool to verify bytecode before deployment, and the <Link href="/faucet" className="text-network-cyan hover:underline">Faucet helper</Link> for direct testnet RPC requests. For the canonical public faucet and onboarding flow, see{" "}
-          <a
-            href={NETWORK_FAUCET_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-network-cyan hover:underline"
-          >
-            boing.network/faucet
-          </a>
+          The explorer for Boing Network: search by block height, hash, or account; browse testnet today; mainnet appears
+          when a separate RPC is configured. Use the header for Wallet, public Faucet, QA, and{" "}
+          <Link href="/tools" className="text-network-cyan hover:underline">
+            Tools
+          </Link>{" "}
+          (RPC helpers).{" "}
+          <Link href="/" className="text-network-cyan hover:underline">
+            Back to home
+          </Link>
           .
         </p>
-        <div className="mt-4 flex flex-wrap gap-4">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-network-cyan hover:text-network-cyan-light font-medium transition-colors"
-          >
-            Explore the blockchain →
-          </Link>
-          <a
-            href={NETWORK_FAUCET_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-network-cyan hover:text-network-cyan-light font-medium transition-colors"
-          >
-            Public faucet →
-          </a>
-          <Link
-            href="/qa"
-            className="inline-flex items-center gap-2 text-network-cyan hover:text-network-cyan-light font-medium transition-colors"
-          >
-            QA transparency →
-          </Link>
-          <Link
-            href="/tools/qa-check"
-            className="inline-flex items-center gap-2 text-network-cyan hover:text-network-cyan-light font-medium transition-colors"
-          >
-            QA Check tool →
-          </Link>
-          <Link
-            href="/faucet"
-            className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium transition-colors"
-          >
-            Faucet helper →
-          </Link>
-        </div>
       </section>
     </div>
   );

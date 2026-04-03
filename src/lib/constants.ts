@@ -1,7 +1,7 @@
 /** Canonical site URL for metadata, links, and structured data. */
 export const SITE_URL = "https://boing.observer";
 
-/** Canonical Boing Network website URL. */
+/** Canonical website; desktop clients may merge `GET https://boing.network/api/networks` → `meta` / `meta.ecosystem` (VIBEMINER-INTEGRATION.md). */
 export const WEBSITE_URL = "https://boing.network";
 
 /** Canonical Boing Wallet (boing.express). */

@@ -8,12 +8,19 @@ import { isHex64, normalizeHex64, type NetworkId } from "@/lib/rpc-types";
 
 const HEIGHT = /^\d+$/;
 
-export function SearchBar() {
+type SearchBarProps = {
+  /** Use vertical layout for narrow panels (e.g. mobile menu). */
+  layout?: "inline" | "stacked";
+  className?: string;
+};
+
+export function SearchBar({ layout = "inline", className = "" }: SearchBarProps) {
   const router = useRouter();
   const { network } = useNetwork();
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const stacked = layout === "stacked";
 
   const search = useCallback(async () => {
     const q = value.trim();
@@ -41,15 +48,19 @@ export function SearchBar() {
   }, [value, network, router]);
 
   return (
-    <div className="w-full max-w-xl">
-      <div className="flex gap-2">
+    <div className={`w-full max-w-xl ${className}`}>
+      <div className={stacked ? "flex flex-col gap-2" : "flex gap-2"}>
         <input
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && search()}
-          placeholder="Block height, block hash, or account address (64 hex)"
-          className="hash flex-1 rounded-lg border border-[var(--border-color)] bg-boing-navy-mid/80 px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-network-primary focus:outline-none focus:ring-1 focus:ring-network-primary"
+          placeholder={
+            stacked
+              ? "Height, 64-char hash, or address"
+              : "Block height, block hash, or account address (64 hex)"
+          }
+          className="hash min-h-11 w-full flex-1 rounded-lg border border-[var(--border-color)] bg-boing-navy-mid/80 px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-network-primary focus:outline-none focus:ring-1 focus:ring-network-primary sm:px-4"
           aria-label="Search by block height, block hash, or account address"
         />
         <button
@@ -57,7 +68,9 @@ export function SearchBar() {
           onClick={() => search()}
           disabled={loading}
           aria-label={loading ? "Searching…" : "Search"}
-          className="rounded-lg bg-network-primary px-4 py-2.5 font-display text-sm font-semibold text-white hover:bg-network-primary-light transition-colors focus:outline-none focus:ring-2 focus:ring-network-cyan disabled:opacity-60"
+          className={`min-h-11 shrink-0 rounded-lg bg-network-primary px-4 py-2.5 font-display text-sm font-semibold text-white hover:bg-network-primary-light transition-colors focus:outline-none focus:ring-2 focus:ring-network-cyan disabled:opacity-60 ${
+            stacked ? "w-full" : ""
+          }`}
         >
           {loading ? "…" : "Search"}
         </button>

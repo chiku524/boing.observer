@@ -64,32 +64,35 @@ export default function QaCheckPage() {
   return (
     <div className="space-y-8 max-w-2xl">
       <nav aria-label="Breadcrumb" className="text-sm">
-        <ol className="flex items-center gap-2 text-[var(--text-muted)]">
+        <ol className="flex flex-wrap items-center gap-2 text-[var(--text-muted)]">
           <li>
-            <Link href="/" className="text-network-cyan hover:underline">Home</Link>
+            <Link href="/" className="text-network-cyan hover:underline">
+              Home
+            </Link>
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <Link href="/about" className="text-network-cyan hover:underline">About</Link>
+            <Link href="/tools" className="text-network-cyan hover:underline">
+              Tools
+            </Link>
           </li>
           <li aria-hidden="true">/</li>
-          <li className="text-[var(--text-primary)]">QA Check</li>
+          <li className="text-[var(--text-primary)]">QA pre-flight</li>
         </ol>
       </nav>
 
       <header>
         <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
-          QA Check — Pre-flight
+          QA pre-flight
         </h1>
-        <p className="mt-2 text-[var(--text-secondary)]">
-          Verify bytecode against the protocol QA rules before submitting a deployment. Uses <code className="px-1.5 py-0.5 rounded bg-white/10 text-sm">boing_qaCheck</code>.
-        </p>
-        <p className="mt-2 text-sm text-[var(--text-muted)]">
-          This page supports the current runtime pre-flight shape: bytecode, optional purpose category, optional description hash, and optional asset metadata fields when your deploy flow uses them.
+        <p className="mt-2 text-[var(--text-secondary)] max-w-2xl">
+          Verify bytecode with <code className="px-1.5 py-0.5 rounded bg-white/10 text-sm">boing_qaCheck</code> before you
+          deploy. Optional fields match the current protocol QA shape (purpose, description hash, asset metadata when used
+          together).
         </p>
       </header>
 
-      <div className="glass-card p-6 space-y-4">
+      <div className="glass-card space-y-4 p-4 sm:p-6">
         <div>
           <label htmlFor="bytecode" className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
             Hex bytecode (required)
@@ -225,25 +228,13 @@ export default function QaCheckPage() {
         </div>
       )}
 
-      <section className="text-sm text-[var(--text-muted)] space-y-2">
-        <p>
-          Valid purpose categories: dApp, token, NFT, meme, community, entertainment, tooling, other.
-        </p>
-        <p>
-          Advanced metadata note: `asset_name` and `asset_symbol` are supported by the current node RPC and are sent from this UI only when a description hash is present.
-        </p>
-        <p>
-          <a
-            href={QA_DOC_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-network-cyan hover:underline"
-          >
-            Quality assurance rules and guidance
-          </a>{" "}
-          cover both the QA flow and the canonical malice definition.
-        </p>
-      </section>
+      <p className="text-sm text-[var(--text-muted)]">
+        Purpose categories include dApp, token, NFT, meme, community, entertainment, tooling, and other. Full policy:{" "}
+        <a href={QA_DOC_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">
+          QA rules and guidance
+        </a>
+        . Live pool status: <Link href="/qa" className="text-network-cyan hover:underline">QA transparency</Link>.
+      </p>
     </div>
   );
 }

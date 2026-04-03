@@ -143,7 +143,7 @@ export function QaTransparencyDashboard() {
       </nav>
 
       <header>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+        <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
           Quality assurance — public transparency
         </h1>
         <p className="mt-3 text-[var(--text-secondary)] leading-relaxed max-w-3xl">
@@ -154,6 +154,13 @@ export function QaTransparencyDashboard() {
           <code className="rounded bg-white/10 px-1.5 py-0.5 text-sm">boing_qaPoolList</code> /{" "}
           <code className="rounded bg-white/10 px-1.5 py-0.5 text-sm">boing_qaPoolConfig</code> /{" "}
           <code className="rounded bg-white/10 px-1.5 py-0.5 text-sm">boing_getQaRegistry</code>.
+        </p>
+        <p className="mt-2 text-sm text-[var(--text-muted)]">
+          Need to check bytecode before deploy?{" "}
+          <Link href="/tools/qa-check" className="text-network-cyan hover:underline">
+            QA pre-flight
+          </Link>{" "}
+          under Tools.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <button
@@ -190,7 +197,7 @@ export function QaTransparencyDashboard() {
 
       <section
         aria-labelledby="registry-heading"
-        className="glass-card border-2 border-network-cyan/30 bg-gradient-to-br from-boing-navy-mid/95 to-boing-black/90 p-6 space-y-5 shadow-lg shadow-network-cyan/5"
+        className="glass-card border-2 border-network-cyan/30 bg-gradient-to-br from-boing-navy-mid/95 to-boing-black/90 space-y-5 p-4 shadow-lg shadow-network-cyan/5 sm:p-6"
       >
         <h2 id="registry-heading" className="font-display text-xl font-semibold text-network-cyan">
           Protocol rule registry — live JSON and canonical baseline

@@ -5,9 +5,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@600;700;900&display=swap');
 
 :root {
+  /* Cosmic Foundation — aligned with boing.network docs/BOING-DESIGN-SYSTEM.md §5 */
   --boing-black: #020408;
   --boing-navy: #0c1428;
   --boing-navy-mid: #0d1f3c;
+  --boing-navy-deep: #060f1e;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
@@ -15,15 +17,23 @@
   --network-primary-light: #a78bfa;
   --network-cyan: #06b6d4;
   --network-cyan-light: #22d3ee;
+  --network-aurora: #0ea5e9;
+  --network-nebula: #c026d3;
   --network-gold: #fbbf24;
   --border-color: rgba(124, 58, 237, 0.18);
   --border-hover: rgba(124, 58, 237, 0.45);
 }
 
 body {
-  background-color: var(--boing-black);
   color: var(--text-primary);
   font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  background-color: var(--boing-black);
+  background-image:
+    radial-gradient(ellipse 120% 70% at 50% -25%, rgba(124, 58, 237, 0.14), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 100% 0%, rgba(6, 182, 212, 0.08), transparent 50%),
+    radial-gradient(ellipse 70% 45% at 0% 100%, rgba(192, 38, 211, 0.06), transparent 45%);
+  background-attachment: fixed;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -33,6 +43,10 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  body {
+    background-attachment: scroll;
   }
 }
 
@@ -58,4 +72,12 @@ body {
 
 .address-link {
   @apply hash text-network-cyan hover:text-network-cyan-light underline underline-offset-2 transition-colors;
+}
+
+.nav-link {
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+.nav-link:hover {
+  color: var(--text-primary);
 }

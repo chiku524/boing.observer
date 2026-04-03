@@ -14,7 +14,6 @@ import { NETWORK_FAUCET_URL } from "@/lib/constants";
 
 export default function HomePage() {
   const { network } = useNetwork();
-  const [height, setHeight] = useState<number | null>(null);
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +25,6 @@ export default function HomePage() {
     fetchChainHeight(network)
       .then((h) => {
         if (cancelled) return [];
-        setHeight(h);
         return Promise.all(
           Array.from({ length: 12 }, (_, i) =>
             fetchBlockByHeight(network, Math.max(0, h - i))
@@ -55,52 +53,25 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       <section>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+        <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
           Boing Observer
         </h1>
-        <p className="mt-1 text-[var(--text-secondary)]">
-          Explore blocks, transactions, and accounts on Boing Network.
-        </p>
-        <p className="mt-2 text-sm text-[var(--text-muted)]">
-          Public onboarding for testnet BOING lives on{" "}
+        <p className="mt-1 text-[var(--text-secondary)] max-w-2xl">
+          Explore blocks, transactions, and accounts on Boing Network. Use the search below or open the{" "}
+          <Link href="/tools" className="text-network-cyan hover:underline">
+            developer tools
+          </Link>{" "}
+          for direct RPC helpers. New to testnet?{" "}
           <a
             href={NETWORK_FAUCET_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="text-network-cyan hover:underline"
           >
-            boing.network/faucet
+            Get BOING on boing.network
           </a>
-          . The explorer also includes direct RPC helper pages for advanced users.
+          .
         </p>
-        <div className="mt-4 flex flex-wrap gap-4 text-sm">
-          <a
-            href={NETWORK_FAUCET_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-network-cyan hover:text-network-cyan-light font-medium transition-colors"
-          >
-            Get testnet BOING →
-          </a>
-          <Link
-            href="/faucet"
-            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium transition-colors"
-          >
-            Use RPC faucet helper →
-          </Link>
-          <Link
-            href="/qa"
-            className="text-network-cyan hover:text-network-cyan-light font-medium transition-colors"
-          >
-            QA transparency (live pool) →
-          </Link>
-          <Link
-            href="/tools/qa-check"
-            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium transition-colors"
-          >
-            QA Check →
-          </Link>
-        </div>
         <div className="mt-6">
           <SearchBar />
         </div>
@@ -112,25 +83,19 @@ export default function HomePage() {
         </div>
       )}
 
-      <NetworkStats />
-
-      <NetworkCharts />
-
-      <section>
-        <h2 className="font-display text-xl font-semibold text-[var(--text-primary)]">
-          Chain tip
+      <section className="space-y-4" aria-labelledby="network-overview-heading">
+        <h2
+          id="network-overview-heading"
+          className="font-display text-xl font-semibold text-[var(--text-primary)]"
+        >
+          Network overview
         </h2>
-        {loading ? (
-          <div className="mt-2 h-8 w-48 bg-white/5 rounded animate-pulse" aria-busy="true" />
-        ) : height !== null ? (
-          <p className="mt-2 font-mono text-lg text-network-cyan">
-            Current height: <span className="font-semibold">{height.toLocaleString()}</span>
-          </p>
-        ) : null}
+        <NetworkStats />
+        <NetworkCharts />
       </section>
 
       <section>
-        <h2 className="font-display text-xl font-semibold text-[var(--text-primary)]">
+        <h2 className="font-display text-lg font-semibold text-[var(--text-primary)] sm:text-xl">
           Latest blocks
         </h2>
         {loading ? (
@@ -140,69 +105,106 @@ export default function HomePage() {
             ))}
           </div>
         ) : blocks.length === 0 && !error ? (
-          <div className="mt-4 glass-card p-8 text-center text-[var(--text-muted)]">
+          <div className="mt-4 glass-card p-6 text-center text-[var(--text-muted)] sm:p-8">
             <p>No blocks yet. The chain may be starting or RPC returned no data.</p>
             <p className="mt-2 text-sm">Try switching networks or refreshing.</p>
           </div>
         ) : (
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[600px] border-collapse">
-              <thead>
-                <tr className="border-b border-[var(--border-color)] text-left text-sm text-[var(--text-muted)]">
-                  <th className="pb-3 pr-4 font-medium">Height</th>
-                  <th className="pb-3 pr-4 font-medium">Hash</th>
-                  <th className="pb-3 pr-4 font-medium">Proposer</th>
-                  <th className="pb-3 pr-4 font-medium">Txns</th>
-                  <th className="pb-3 font-medium">Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {blocks.map((b) => {
-                  const hashStr = hexForLink(b.hash);
-                  const proposerStr = hexForLink(b.header.proposer);
-                  return (
-                  <tr
+          <>
+            <div className="mt-4 space-y-3 md:hidden">
+              {blocks.map((b) => {
+                const hashStr = hexForLink(b.hash);
+                const proposerStr = hexForLink(b.header.proposer);
+                const t = b.header.timestamp
+                  ? new Date(Number(b.header.timestamp) * 1000).toLocaleString()
+                  : "—";
+                return (
+                  <Link
                     key={hashStr || b.header.height}
-                    className="border-b border-[var(--border-color)]/60 hover:bg-white/5 transition-colors"
+                    href={`/block/${b.header.height}?network=${network}`}
+                    className="glass-card block space-y-2 p-4 transition-colors hover:border-[var(--border-hover)] active:bg-white/[0.03]"
                   >
-                    <td className="py-3 pr-4">
-                      <Link
-                        href={`/block/${b.header.height}?network=${network}`}
-                        className="font-mono text-network-cyan hover:text-network-cyan-light underline underline-offset-2"
-                      >
-                        {b.header.height}
-                      </Link>
-                    </td>
-                    <td className="py-3 pr-4">
-                      <Link
-                        href={`/block/hash/${hashStr}?network=${network}`}
-                        className="hash text-[var(--text-secondary)] hover:text-network-primary-light"
-                      >
-                        {shortenHash(hashStr)}
-                      </Link>
-                    </td>
-                    <td className="py-3 pr-4">
-                      <Link
-                        href={`/account/${proposerStr}?network=${network}`}
-                        className="hash text-network-cyan hover:underline"
-                      >
-                        {shortenHash(proposerStr)}
-                      </Link>
-                    </td>
-                    <td className="py-3 pr-4 font-mono text-sm">
-                      {b.transactions?.length ?? 0}
-                    </td>
-                    <td className="py-3 font-mono text-sm text-[var(--text-muted)]">
-                      {b.header.timestamp
-                        ? new Date(Number(b.header.timestamp) * 1000).toLocaleString()
-                        : "—"}
-                    </td>
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-display text-lg font-semibold text-network-cyan">
+                        #{b.header.height}
+                      </span>
+                      <span className="shrink-0 text-right font-mono text-xs text-[var(--text-muted)]">{t}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--text-secondary)]">
+                      <span>
+                        Hash{" "}
+                        <span className="hash text-[var(--text-primary)]">{shortenHash(hashStr)}</span>
+                      </span>
+                      <span>
+                        Txns <span className="font-mono text-network-cyan">{b.transactions?.length ?? 0}</span>
+                      </span>
+                    </div>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      Proposer <span className="hash text-[var(--text-secondary)]">{shortenHash(proposerStr)}</span>
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="mt-4 hidden overflow-x-auto md:block">
+              <table className="w-full min-w-[600px] border-collapse">
+                <thead>
+                  <tr className="border-b border-[var(--border-color)] text-left text-sm text-[var(--text-muted)]">
+                    <th className="pb-3 pr-4 font-medium">Height</th>
+                    <th className="pb-3 pr-4 font-medium">Hash</th>
+                    <th className="pb-3 pr-4 font-medium">Proposer</th>
+                    <th className="pb-3 pr-4 font-medium">Txns</th>
+                    <th className="pb-3 font-medium">Time</th>
                   </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {blocks.map((b) => {
+                    const hashStr = hexForLink(b.hash);
+                    const proposerStr = hexForLink(b.header.proposer);
+                    return (
+                      <tr
+                        key={hashStr || b.header.height}
+                        className="border-b border-[var(--border-color)]/60 hover:bg-white/5 transition-colors"
+                      >
+                        <td className="py-3 pr-4">
+                          <Link
+                            href={`/block/${b.header.height}?network=${network}`}
+                            className="font-mono text-network-cyan hover:text-network-cyan-light underline underline-offset-2"
+                          >
+                            {b.header.height}
+                          </Link>
+                        </td>
+                        <td className="py-3 pr-4">
+                          <Link
+                            href={`/block/hash/${hashStr}?network=${network}`}
+                            className="hash text-[var(--text-secondary)] hover:text-network-primary-light"
+                          >
+                            {shortenHash(hashStr)}
+                          </Link>
+                        </td>
+                        <td className="py-3 pr-4">
+                          <Link
+                            href={`/account/${proposerStr}?network=${network}`}
+                            className="hash text-network-cyan hover:underline"
+                          >
+                            {shortenHash(proposerStr)}
+                          </Link>
+                        </td>
+                        <td className="py-3 pr-4 font-mono text-sm">
+                          {b.transactions?.length ?? 0}
+                        </td>
+                        <td className="py-3 font-mono text-sm text-[var(--text-muted)]">
+                          {b.header.timestamp
+                            ? new Date(Number(b.header.timestamp) * 1000).toLocaleString()
+                            : "—"}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
     </div>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { NetworkProvider } from "@/context/network-context";
 import { Header } from "@/components/header";
@@ -10,6 +10,11 @@ import { SITE_URL, WEBSITE_URL, WALLET_URL } from "@/lib/constants";
 // Set in env: NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION, NEXT_PUBLIC_BING_SITE_VERIFICATION
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 const bingVerification = process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION;
+
+/** Enables edge-to-edge layout on notched iOS devices; pairs with safe-area env() in CSS. */
+export const viewport: Viewport = {
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -101,7 +106,7 @@ export default function RootLayout({
         "@id": `${SITE_URL}/#organization`,
         name: "Boing Network",
         url: SITE_URL,
-        slogan: "Authentic. Decentralized. Optimal. Sustainable.",
+        slogan: "Authentic. Decentralized. Optimal. Quality-Assured.",
       },
     ],
   };
@@ -118,13 +123,20 @@ export default function RootLayout({
         <NetworkProvider>
           <Header />
           <NetworkStatusBanner />
-          <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6" role="main" id="main-content">{children}</main>
-          <footer className="mt-auto border-t border-[var(--border-color)] py-6 text-center text-sm text-[var(--text-muted)]">
-            <p className="mb-2">Boing Network — Authentic. Decentralized. Optimal. Sustainable.</p>
-            <p className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+          <main
+            className="mx-auto w-full min-w-0 max-w-7xl overflow-x-hidden px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-8"
+            role="main"
+            id="main-content"
+          >
+            {children}
+          </main>
+          <footer className="mt-auto border-t border-[var(--border-color)] px-4 py-6 text-center text-xs text-[var(--text-muted)] sm:px-6 sm:text-sm">
+            <p className="mb-2 leading-relaxed">Boing Network — Authentic. Decentralized. Optimal. Quality-Assured.</p>
+            <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 sm:gap-x-4">
               <a href={WEBSITE_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">boing.network</a>
               <a href={WALLET_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">Wallet (boing.express)</a>
               <Link href="/qa" className="text-network-cyan hover:underline">QA transparency</Link>
+              <Link href="/tools" className="text-network-cyan hover:underline">Tools</Link>
             </p>
           </footer>
         </NetworkProvider>

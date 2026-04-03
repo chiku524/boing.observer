@@ -84,23 +84,16 @@ export function NetworkStats() {
 
   if (error) {
     return (
-      <section
-        className="py-4"
-        aria-label="Network statistics"
-      >
+      <div className="py-2" role="region" aria-label="Network statistics">
         <div className="glass-card border-amber-500/30 bg-amber-950/20 p-4 text-sm text-amber-200" role="alert">
           {error}
         </div>
-      </section>
+      </div>
     );
   }
 
   return (
-    <section
-      className="py-4"
-      aria-label="Network statistics"
-    >
-      <h2 className="sr-only">Network statistics</h2>
+    <div className="py-2" role="region" aria-label="Summary statistics">
       <div className="flex flex-wrap gap-3">
         <StatCard
           label="Block height"
@@ -130,6 +123,6 @@ export function NetworkStats() {
           loading={loading}
         />
       </div>
-    </section>
+    </div>
   );
 }

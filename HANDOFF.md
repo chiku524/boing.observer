@@ -6,7 +6,7 @@ It has been updated to reflect the current `boing.network` state, including the 
 
 ## Current Status
 
-`boing.observer` is a functioning read-only blockchain explorer for Boing Network built with `Next.js 14`, `React 18`, `TypeScript`, `Tailwind CSS`, and deployed toward `Cloudflare Workers` via the `OpenNext` Cloudflare adapter.
+`boing.observer` is a functioning read-only blockchain explorer for Boing Network built with `Next.js 15`, `React 18`, `TypeScript`, `Tailwind CSS`, and deployed toward `Cloudflare Workers` via the `OpenNext` Cloudflare adapter.
 
 Current state:
 

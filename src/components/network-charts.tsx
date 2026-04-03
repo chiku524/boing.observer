@@ -80,21 +80,21 @@ export function NetworkCharts() {
 
   if (error) {
     return (
-      <section className="py-4" aria-label="Network charts">
+      <div className="py-2" role="region" aria-label="Network charts">
         <div className="glass-card border-amber-500/30 bg-amber-950/20 p-4 text-sm text-amber-200" role="alert">
           {error}
         </div>
-      </section>
+      </div>
     );
   }
 
   const blockTimeData = data.filter((d) => d.blockTimeSec != null);
 
   return (
-    <section className="py-4 space-y-6" aria-label="Network charts">
-      <h2 className="font-display text-lg font-semibold text-[var(--text-primary)]">
-        Network metrics
-      </h2>
+    <div className="py-2 space-y-4" role="region" aria-label="Block production charts">
+      <h3 className="font-display text-base font-semibold text-[var(--text-primary)]">
+        Block time and throughput
+      </h3>
 
       {loading ? (
         <div className="glass-card p-8 flex items-center justify-center text-[var(--text-muted)]">
@@ -190,6 +190,6 @@ export function NetworkCharts() {
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }

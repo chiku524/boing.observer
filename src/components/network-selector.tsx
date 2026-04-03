@@ -1,7 +1,7 @@
 "use client";
 
 import { useNetwork } from "@/context/network-context";
-import { boingChainIdLabel } from "@/lib/chain-ids";
+import { boingChainIdLabel, boingNetworkId } from "@/lib/chain-ids";
 import { isMainnetConfigured } from "@/lib/rpc-client";
 import type { NetworkId } from "@/lib/rpc-types";
 
@@ -28,8 +28,8 @@ export function NetworkSelector() {
         </select>
       </div>
       <span
-        className="text-[0.65rem] font-mono text-[var(--text-secondary)] tabular-nums sm:border-l sm:border-[var(--border-color)] sm:pl-2"
-        title="Chain ID reported to dApps (Boing Express / boing.finance). Not returned by block RPC."
+        className="hidden text-[0.65rem] font-mono text-[var(--text-secondary)] tabular-nums lg:block lg:border-l lg:border-[var(--border-color)] lg:pl-2"
+        title={`${boingNetworkId(network)} — chain ID for dApps (Boing Express / boing.finance); not returned by block RPC.`}
       >
         Chain {boingChainIdLabel(network)}
       </span>

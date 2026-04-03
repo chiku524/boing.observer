@@ -58,7 +58,7 @@ export default function AccountPage() {
     <div className="space-y-6">
       <Link href="/" className="text-network-cyan hover:underline text-sm">← Home</Link>
 
-      <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
+      <h1 className="font-display text-xl font-bold text-[var(--text-primary)] sm:text-2xl">
         Account
       </h1>
       <div className="flex items-center gap-2 flex-wrap">
@@ -77,7 +77,7 @@ export default function AccountPage() {
       {error && <p className="text-amber-300" role="alert">{error}</p>}
 
       {!loading && !error && account && (
-        <div className="glass-card p-6 space-y-4">
+        <div className="glass-card space-y-4 p-4 sm:p-6">
           <h2 className="font-display text-lg font-semibold text-[var(--text-primary)]">Balance &amp; state</h2>
           <dl className="grid gap-3 text-sm">
             <div className="flex flex-wrap gap-x-2">

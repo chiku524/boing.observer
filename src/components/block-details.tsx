@@ -32,6 +32,38 @@ function TxRow({ tx, index, network }: { tx: BlockTransaction; index: number; ne
   );
 }
 
+function TxMobileCard({ tx, index, network }: { tx: BlockTransaction; index: number; network: string }) {
+  const kind = getTxPayloadKind(tx.payload);
+  const summary = getTxPayloadSummary(tx.payload);
+  const narrative = getTxExplorerNarrative(tx.sender, tx.payload);
+  const sender = hexForLink(tx.sender);
+
+  return (
+    <div className="glass-card space-y-3 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-mono text-xs text-[var(--text-muted)]">#{index}</span>
+        <span className="rounded bg-boing-navy-mid px-2 py-0.5 text-xs font-medium text-network-cyan">
+          {kind}
+        </span>
+      </div>
+      <div>
+        <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-muted)]">Sender</p>
+        <Link href={`/account/${sender}?network=${network}`} className="address-link mt-1 inline-block text-sm">
+          {shortenHash(sender || "0")}
+        </Link>
+      </div>
+      <div>
+        <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-muted)]">Summary</p>
+        <p className="mt-1 text-sm text-[var(--text-secondary)]">{summary}</p>
+      </div>
+      <div>
+        <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-muted)]">Effect</p>
+        <p className="mt-1 text-sm text-[var(--text-muted)] leading-relaxed">{narrative}</p>
+      </div>
+    </div>
+  );
+}
+
 export function BlockDetails({
   block,
   network,
@@ -48,7 +80,7 @@ export function BlockDetails({
   return (
     <>
       {explainerVariant ? <BlockExplainerBanner variant={explainerVariant} /> : null}
-      <div className="glass-card p-6 space-y-4">
+      <div className="glass-card space-y-4 p-4 sm:p-6">
         <h2 className="font-display text-lg font-semibold text-[var(--text-primary)]">Header</h2>
         <dl className="grid gap-2 text-sm">
           <div className="flex flex-wrap gap-x-2 items-center gap-y-1">
@@ -118,7 +150,7 @@ export function BlockDetails({
         </dl>
       </div>
 
-      <div className="glass-card p-6">
+      <div className="glass-card p-4 sm:p-6">
         <h2 className="font-display text-lg font-semibold text-[var(--text-primary)] mb-4">
           Transactions ({block.transactions?.length ?? 0})
         </h2>
@@ -129,24 +161,31 @@ export function BlockDetails({
         {!block.transactions?.length ? (
           <p className="text-[var(--text-muted)]">No transactions.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px]">
-              <thead>
-                <tr className="border-b border-[var(--border-color)] text-left text-sm text-[var(--text-muted)]">
-                  <th className="pb-2 pr-4">#</th>
-                  <th className="pb-2 pr-4">Type</th>
-                  <th className="pb-2 pr-4">Sender</th>
-                  <th className="pb-2 pr-4">Summary</th>
-                  <th className="pb-2">What happened</th>
-                </tr>
-              </thead>
-              <tbody>
-                {block.transactions.map((tx, i) => (
-                  <TxRow key={i} tx={tx} index={i} network={network} />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <>
+            <div className="space-y-3 md:hidden">
+              {block.transactions.map((tx, i) => (
+                <TxMobileCard key={i} tx={tx} index={i} network={network} />
+              ))}
+            </div>
+            <div className="hidden md:block overflow-x-auto -mx-1 px-1">
+              <table className="w-full min-w-[720px]">
+                <thead>
+                  <tr className="border-b border-[var(--border-color)] text-left text-sm text-[var(--text-muted)]">
+                    <th className="pb-2 pr-4">#</th>
+                    <th className="pb-2 pr-4">Type</th>
+                    <th className="pb-2 pr-4">Sender</th>
+                    <th className="pb-2 pr-4">Summary</th>
+                    <th className="pb-2">What happened</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {block.transactions.map((tx, i) => (
+                    <TxRow key={i} tx={tx} index={i} network={network} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </>

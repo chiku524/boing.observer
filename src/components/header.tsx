@@ -2,50 +2,48 @@
 
 import Link from "next/link";
 import { NETWORK_FAUCET_URL, WALLET_URL } from "@/lib/constants";
+import { MobileMenu } from "@/components/mobile-menu";
 import { NetworkSelector } from "./network-selector";
 import { SearchBar } from "./search-bar";
 
 export function Header() {
   return (
     <header
-      className="sticky top-0 z-50 border-b border-[var(--border-color)] bg-boing-black/90 backdrop-blur-md"
+      className="sticky top-0 z-50 border-b border-[var(--border-color)] bg-boing-black/90 pt-[env(safe-area-inset-top)] backdrop-blur-md"
       role="banner"
     >
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex min-h-14 w-full max-w-7xl flex-wrap items-center gap-x-2 gap-y-2 px-4 py-2 sm:gap-x-3 sm:px-6 lg:h-14 lg:flex-nowrap lg:py-0">
         <Link
           href="/"
-          className="font-display text-lg font-bold tracking-tight text-[var(--text-primary)] hover:text-network-primary-light transition-colors shrink-0"
+          className="min-w-0 shrink-0 font-display text-base font-bold tracking-tight text-[var(--text-primary)] hover:text-network-primary-light transition-colors sm:text-lg"
           aria-label="Boing Observer - Home"
         >
-          ⬡ Boing Observer
+          <span aria-hidden>⬡ </span>
+          <span className="hidden min-[360px]:inline">Boing </span>
+          Observer
         </Link>
-        <div className="hidden md:block flex-1 max-w-md" role="search">
-          <SearchBar />
-        </div>
-        <nav className="flex items-center gap-4 shrink-0" aria-label="Main navigation">
-          <Link
-            href="/"
-            className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-          >
+
+        <nav
+          className="hidden shrink-0 items-center gap-x-2 lg:flex xl:gap-x-4"
+          aria-label="Main navigation"
+        >
+          <Link href="/" className="nav-link whitespace-nowrap px-1 py-2 text-sm">
             Home
           </Link>
-          <Link
-            href="/about"
-            className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-          >
+          <Link href="/about" className="nav-link whitespace-nowrap px-1 py-2 text-sm">
             About
           </Link>
-          <Link
-            href="/qa"
-            className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-          >
+          <Link href="/qa" className="nav-link whitespace-nowrap px-1 py-2 text-sm">
             QA
+          </Link>
+          <Link href="/tools" className="nav-link whitespace-nowrap px-1 py-2 text-sm">
+            Tools
           </Link>
           <a
             href={WALLET_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="nav-link whitespace-nowrap px-1 py-2 text-sm"
           >
             Wallet
           </a>
@@ -53,12 +51,23 @@ export function Header() {
             href={NETWORK_FAUCET_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="nav-link whitespace-nowrap px-1 py-2 text-sm"
           >
-            Get Testnet BOING
+            Faucet
           </a>
-          <NetworkSelector />
         </nav>
+
+        <div
+          className="order-last hidden min-w-0 flex-1 justify-center px-2 lg:order-none lg:flex lg:max-w-md lg:flex-1"
+          role="search"
+        >
+          <SearchBar className="w-full" />
+        </div>
+
+        <div className="ml-auto flex shrink-0 items-center gap-2">
+          <NetworkSelector />
+          <MobileMenu />
+        </div>
       </div>
     </header>
   );
