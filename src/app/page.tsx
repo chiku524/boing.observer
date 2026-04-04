@@ -52,23 +52,26 @@ export default function HomePage() {
 
   return (
     <div className="space-y-8">
-      <section>
-        <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
+      <section aria-labelledby="home-intro-heading">
+        <h1
+          id="home-intro-heading"
+          className="font-display text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
+        >
           Boing Observer
         </h1>
-        <p className="mt-1 text-[var(--text-secondary)] max-w-2xl">
-          Explore blocks, transactions, and accounts on Boing Network. Use the search below or open the{" "}
+        <p className="mt-1 max-w-2xl text-[var(--text-secondary)]">
+          Blocks, accounts, and transactions on Boing.{" "}
           <Link href="/tools" className="text-network-cyan hover:underline">
-            developer tools
-          </Link>{" "}
-          for direct RPC helpers. New to testnet?{" "}
+            Tools
+          </Link>
+          {" · "}
           <a
             href={NETWORK_FAUCET_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="text-network-cyan hover:underline"
           >
-            Get BOING on boing.network
+            Testnet faucet
           </a>
           .
         </p>
@@ -94,8 +97,11 @@ export default function HomePage() {
         <NetworkCharts />
       </section>
 
-      <section>
-        <h2 className="font-display text-lg font-semibold text-[var(--text-primary)] sm:text-xl">
+      <section aria-labelledby="latest-blocks-heading">
+        <h2
+          id="latest-blocks-heading"
+          className="font-display text-lg font-semibold text-[var(--text-primary)] sm:text-xl"
+        >
           Latest blocks
         </h2>
         {loading ? (
@@ -106,8 +112,7 @@ export default function HomePage() {
           </div>
         ) : blocks.length === 0 && !error ? (
           <div className="mt-4 glass-card p-6 text-center text-[var(--text-muted)] sm:p-8">
-            <p>No blocks yet. The chain may be starting or RPC returned no data.</p>
-            <p className="mt-2 text-sm">Try switching networks or refreshing.</p>
+            <p>No blocks loaded — try another network or refresh.</p>
           </div>
         ) : (
           <>
@@ -148,6 +153,7 @@ export default function HomePage() {
             </div>
             <div className="mt-4 hidden overflow-x-auto md:block">
               <table className="w-full min-w-[600px] border-collapse">
+                <caption className="sr-only">Latest blocks, newest first</caption>
                 <thead>
                   <tr className="border-b border-[var(--border-color)] text-left text-sm text-[var(--text-muted)]">
                     <th className="pb-3 pr-4 font-medium">Height</th>

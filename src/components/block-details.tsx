@@ -26,8 +26,10 @@ export function BlockDetails({
   return (
     <>
       {explainerVariant ? <BlockExplainerBanner variant={explainerVariant} /> : null}
-      <div className="glass-card space-y-4 p-4 sm:p-6">
-        <h2 className="font-display text-lg font-semibold text-[var(--text-primary)]">Header</h2>
+      <section className="glass-card space-y-4 p-4 sm:p-6" aria-labelledby="block-header-heading">
+        <h2 id="block-header-heading" className="font-display text-lg font-semibold text-[var(--text-primary)]">
+          Block header
+        </h2>
         <dl className="grid gap-2 text-sm">
           <div className="flex flex-wrap gap-x-2 items-center gap-y-1">
             <dt className="text-[var(--text-muted)]">Hash</dt>
@@ -96,17 +98,16 @@ export function BlockDetails({
             <dd className="hash text-[var(--text-secondary)]">{block.header.tx_root ?? "—"}</dd>
           </div>
         </dl>
-      </div>
+      </section>
 
-      <div className="space-y-4">
+      <section className="space-y-4" aria-labelledby="block-txs-heading">
         <div>
-          <h2 className="font-display text-lg font-semibold text-[var(--text-primary)]">
+          <h2 id="block-txs-heading" className="font-display text-lg font-semibold text-[var(--text-primary)]">
             Transactions ({txs.length})
           </h2>
-          <p className="mt-2 max-w-3xl text-sm text-[var(--text-muted)] leading-relaxed">
-            Each card is one signed transaction executed in this block. Boing does not use an EVM-style
-            “transaction hash” for every transfer; execution receipts (gas, return data, logs) appear when
-            the node returns them with the block.
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--text-muted)]">
+            One card per executed transaction. Receipts (gas, logs, return data) show when the node includes
+            them.
           </p>
         </div>
         {!txs.length ? (
@@ -125,7 +126,7 @@ export function BlockDetails({
             ))}
           </div>
         )}
-      </div>
+      </section>
     </>
   );
 }

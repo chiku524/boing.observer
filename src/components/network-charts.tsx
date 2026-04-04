@@ -91,8 +91,11 @@ export function NetworkCharts() {
   const blockTimeData = data.filter((d) => d.blockTimeSec != null);
 
   return (
-    <div className="py-2 space-y-4" role="region" aria-label="Block production charts">
-      <h3 className="font-display text-base font-semibold text-[var(--text-primary)]">
+    <div className="space-y-4 py-2" role="region" aria-labelledby="charts-region-heading">
+      <h3
+        id="charts-region-heading"
+        className="font-display text-base font-semibold text-[var(--text-primary)]"
+      >
         Block time and throughput
       </h3>
 
@@ -107,9 +110,7 @@ export function NetworkCharts() {
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="glass-card p-4">
-            <h3 className="text-sm font-medium text-[var(--text-muted)] mb-3">
-              Block time (seconds)
-            </h3>
+            <h4 className="mb-3 text-sm font-medium text-[var(--text-muted)]">Block time (seconds)</h4>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
@@ -150,9 +151,7 @@ export function NetworkCharts() {
           </div>
 
           <div className="glass-card p-4">
-            <h3 className="text-sm font-medium text-[var(--text-muted)] mb-3">
-              Transactions per block
-            </h3>
+            <h4 className="mb-3 text-sm font-medium text-[var(--text-muted)]">Transactions per block</h4>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart

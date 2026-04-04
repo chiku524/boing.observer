@@ -34,14 +34,9 @@ export function NetworkStatusBanner() {
       aria-live="polite"
       className="border-b border-amber-500/40 bg-amber-950/30 px-3 py-3 text-center text-xs text-amber-200 sm:px-4 sm:text-sm"
     >
-      <strong>RPC unavailable.</strong>{" "}
-      Unable to reach the Boing Network RPC. The network may be starting up, or
-      requests may be blocked (e.g. CORS). Check the console for details.
-      <a
-        href="/about"
-        className="ml-2 font-medium text-amber-100 hover:text-amber-50 underline underline-offset-2"
-      >
-        Learn more
+      <strong>RPC unreachable.</strong> The chain may be down or the browser blocked the request (e.g. CORS).{" "}
+      <a href="/about" className="font-medium text-amber-100 underline underline-offset-2 hover:text-amber-50">
+        About
       </a>
     </div>
   );

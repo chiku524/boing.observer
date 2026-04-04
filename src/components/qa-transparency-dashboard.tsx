@@ -102,7 +102,7 @@ export function QaTransparencyDashboard() {
       } else {
         setRegistry(null);
         setRegistryError(
-          `${getFriendlyRpcErrorMessage(regRes.reason, network, "general")} Upgrade the configured RPC for this network (e.g. public testnet) to a boing-node that implements boing_getQaRegistry, or use the canonical JSON links above.`
+          `${getFriendlyRpcErrorMessage(regRes.reason, network, "general")} Use a node with boing_getQaRegistry or the canonical JSON links.`
         );
       }
 
@@ -129,7 +129,7 @@ export function QaTransparencyDashboard() {
   }, [autoRefresh, load]);
 
   return (
-    <div className="space-y-10 max-w-5xl">
+    <div className="space-y-10">
       <nav aria-label="Breadcrumb" className="text-sm">
         <ol className="flex flex-wrap items-center gap-2 text-[var(--text-muted)]">
           <li>
@@ -144,23 +144,16 @@ export function QaTransparencyDashboard() {
 
       <header>
         <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
-          Quality assurance — public transparency
+          QA transparency
         </h1>
-        <p className="mt-3 text-[var(--text-secondary)] leading-relaxed max-w-3xl">
-          Boing enforces protocol QA on every contract deployment. This page reads the same public JSON-RPC as the rest of
-          the explorer: live <strong className="text-[var(--text-primary)]">governance pool parameters</strong>, the{" "}
-          <strong className="text-[var(--text-primary)]">pending review queue</strong>, and per-item vote tallies. Nothing here
-          is hidden behind a private API—verify the data against your own node or{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-sm">boing_qaPoolList</code> /{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-sm">boing_qaPoolConfig</code> /{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-sm">boing_getQaRegistry</code>.
+        <p className="mt-3 max-w-2xl text-[var(--text-secondary)] leading-relaxed">
+          Live pool config, pending queue, and rule registry from public RPC — same methods the explorer uses elsewhere.
         </p>
         <p className="mt-2 text-sm text-[var(--text-muted)]">
-          Need to check bytecode before deploy?{" "}
           <Link href="/tools/qa-check" className="text-network-cyan hover:underline">
             QA pre-flight
           </Link>{" "}
-          under Tools.
+          (bytecode check)
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <button
@@ -200,15 +193,11 @@ export function QaTransparencyDashboard() {
         className="glass-card border-2 border-network-cyan/30 bg-gradient-to-br from-boing-navy-mid/95 to-boing-black/90 space-y-5 p-4 shadow-lg shadow-network-cyan/5 sm:p-6"
       >
         <h2 id="registry-heading" className="font-display text-xl font-semibold text-network-cyan">
-          Protocol rule registry — live JSON and canonical baseline
+          Rule registry
         </h2>
-        <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-3xl">
-          The table below is the exact <strong className="text-[var(--text-primary)]">RuleRegistry</strong> your selected RPC
-          uses for bytecode and purpose checks. It is returned by read-only{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">boing_getQaRegistry</code> (same shape as{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">qa_registry.json</code> on the node).{" "}
-          <strong className="text-[var(--text-primary)]">Canonical JSON</strong> in the Boing repo is a documented default for
-          comparison only — production networks may differ after governance.
+        <p className="max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">
+          From <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">boing_getQaRegistry</code>. Repo JSON is a
+          comparison baseline; live networks may differ.
         </p>
         <div className="flex flex-wrap gap-2">
           <a
@@ -251,15 +240,14 @@ export function QaTransparencyDashboard() {
               <strong className="text-amber-200">Registry RPC:</strong> {registryError}
             </p>
             <p className="mt-3 text-xs leading-relaxed text-amber-100/85">
-              This page calls the explorer&apos;s RPC URL (not <span className="font-mono">localhost</span> from VibeMiner).
-              Updating your local node alone does not change boing.observer until the public endpoint is upgraded.{" "}
+              Data comes from the explorer&apos;s RPC URL.{" "}
               <a
                 href={QA_RPC_TWO_SURFACES_DOC_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-network-cyan underline-offset-2 hover:underline"
               >
-                Local vs public RPC — Boing docs §2.1
+                Local vs public RPC
               </a>
             </p>
           </div>
@@ -321,15 +309,15 @@ export function QaTransparencyDashboard() {
               }`}
             >
               <p className="font-medium text-[var(--text-primary)]">
-                Pool status:{" "}
+                Pool:{" "}
                 <span className={config.accepts_new_pending ? "text-network-cyan" : "text-amber-200"}>
-                  {config.accepts_new_pending ? "Accepting new pending items (when rules allow)" : "Not accepting new pending items"}
+                  {config.accepts_new_pending ? "Open for new items" : "Closed to new items"}
                 </span>
               </p>
               <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                <span className="font-mono text-network-cyan">{config.pending_count}</span> pending now · cap{" "}
-                <span className="font-mono">{config.max_pending_items}</span> global ·{" "}
-                <span className="font-mono">{config.max_pending_per_deployer}</span> per deployer · review window{" "}
+                <span className="font-mono text-network-cyan">{config.pending_count}</span> pending · cap{" "}
+                <span className="font-mono">{config.max_pending_items}</span> /{" "}
+                <span className="font-mono">{config.max_pending_per_deployer}</span> per deployer · window{" "}
                 <span className="font-mono">{formatDuration(config.review_window_secs)}</span>
               </p>
             </div>
@@ -367,23 +355,24 @@ export function QaTransparencyDashboard() {
       </section>
 
       <section aria-labelledby="pending-heading">
-        <h2 id="pending-heading" className="font-display text-xl font-semibold text-[var(--text-primary)] mb-2">
+        <h2 id="pending-heading" className="mb-2 font-display text-xl font-semibold text-[var(--text-primary)]">
           Pending queue
         </h2>
-        <p className="text-sm text-[var(--text-muted)] mb-4">
-          Each row is a deployment classified <strong className="text-[var(--text-secondary)]">Unsure</strong> by protocol QA,
-          waiting for governance. Vote counts are public; casting votes uses operator tooling (see{" "}
+        <p className="mb-4 text-sm text-[var(--text-muted)]">
+          <strong className="text-[var(--text-secondary)]">Unsure</strong> deploys awaiting governance. Votes:{" "}
           <a href={RPC_SPEC_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">
             RPC spec
           </a>
-          ).
+          .
         </p>
         {loading && items.length === 0 && !error ? (
           <div className="h-32 glass-card animate-pulse bg-white/5" aria-busy="true" />
         ) : items.length === 0 ? (
           <div className="glass-card p-8 text-center text-[var(--text-muted)]">
-            <p>No pending items in the pool right now.</p>
-            <p className="mt-2 text-sm">When deploys are referred with <code className="rounded bg-white/10 px-1">-32051</code>, they appear here.</p>
+            <p>No pending items.</p>
+            <p className="mt-2 text-sm">
+              <code className="rounded bg-white/10 px-1">-32051</code> deploys show here when referred.
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto glass-card">
@@ -432,62 +421,47 @@ export function QaTransparencyDashboard() {
         )}
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
-        <div className="glass-card p-6 space-y-3">
-          <h2 className="font-display text-lg font-semibold text-network-cyan">Protocol path (Allow / Reject / Unsure)</h2>
-          <ul className="list-disc pl-5 space-y-2 text-[var(--text-secondary)] text-sm leading-relaxed">
-            <li>
-              <strong className="text-[var(--text-primary)]">Allow</strong> — deployment meets automated rules; it can proceed.
-            </li>
-            <li>
-              <strong className="text-[var(--text-primary)]">Reject</strong> — blocked with structured feedback (e.g.{" "}
-              <code className="rounded bg-white/10 px-1">rule_id</code>).
-            </li>
-            <li>
-              <strong className="text-[var(--text-primary)]">Unsure</strong> — needs human governance review; may enter this pool
-              (see error <code className="rounded bg-white/10 px-1">-32051</code> on submit).
-            </li>
-          </ul>
-          <p className="text-sm">
-            <a href={QA_DOC_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">
-              Full QA design &amp; malice definition →
-            </a>
-          </p>
-        </div>
-        <div className="glass-card p-6 space-y-3">
-          <h2 className="font-display text-lg font-semibold text-network-cyan">Try pre-flight QA</h2>
-          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-            Before spending gas, run bytecode through the same <code className="rounded bg-white/10 px-1">boing_qaCheck</code>{" "}
-            logic the node uses for a dry run (allow / reject / unsure).
-          </p>
-          <Link
-            href="/tools/qa-check"
-            className="inline-flex font-medium text-network-cyan hover:text-network-cyan-light"
-          >
-            Open QA Check tool →
-          </Link>
-        </div>
-      </section>
-
-      <section className="glass-card p-6">
-        <h2 className="font-display text-lg font-semibold text-[var(--text-primary)] mb-3">
-          QA-related RPC errors (transparency)
+      <section className="glass-card space-y-4 p-6" aria-labelledby="qa-reference-heading">
+        <h2 id="qa-reference-heading" className="font-display text-lg font-semibold text-[var(--text-primary)]">
+          Reference
         </h2>
-        <p className="text-sm text-[var(--text-muted)] mb-4">
-          Wallets and dApps surface these codes when submitting deploys. Source:{" "}
-          <a href={RPC_SPEC_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">
-            RPC-API-SPEC.md
-          </a>
-          .
-        </p>
-        <ul className="divide-y divide-[var(--border-color)]/60 text-sm">
-          {RPC_QA_ERRORS.map((row) => (
-            <li key={row.code} className="py-2.5 flex flex-col sm:flex-row sm:gap-4">
-              <span className="font-mono text-network-cyan shrink-0 w-24">{row.code}</span>
-              <span className="text-[var(--text-secondary)]">{row.summary}</span>
-            </li>
-          ))}
+        <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-[var(--text-secondary)]">
+          <li>
+            <strong className="text-[var(--text-primary)]">Allow</strong> /{" "}
+            <strong className="text-[var(--text-primary)]">Reject</strong> /{" "}
+            <strong className="text-[var(--text-primary)]">Unsure</strong> — automated path; Unsure may yield pool entry (
+            <code className="rounded bg-white/10 px-1">-32051</code>).
+          </li>
+          <li>
+            <Link href="/tools/qa-check" className="text-network-cyan hover:underline">
+              QA pre-flight
+            </Link>
+            {" — "}
+            <code className="rounded bg-white/10 px-1">boing_qaCheck</code> dry run.
+          </li>
+          <li>
+            <a href={QA_DOC_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">
+              QA policy
+            </a>
+            {" · "}
+            <a href={RPC_SPEC_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">
+              RPC error codes
+            </a>
+          </li>
         </ul>
+        <details className="rounded-lg border border-[var(--border-color)] bg-boing-black/30">
+          <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-[var(--text-secondary)] hover:bg-white/5">
+            QA RPC error code list
+          </summary>
+          <ul className="divide-y divide-[var(--border-color)]/60 border-t border-[var(--border-color)] px-4 py-2 text-sm">
+            {RPC_QA_ERRORS.map((row) => (
+              <li key={row.code} className="flex flex-col gap-1 py-2.5 sm:flex-row sm:gap-4">
+                <span className="w-24 shrink-0 font-mono text-network-cyan">{row.code}</span>
+                <span className="text-[var(--text-secondary)]">{row.summary}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
       </section>
     </div>
   );

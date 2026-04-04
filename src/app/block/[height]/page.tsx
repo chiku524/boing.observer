@@ -45,19 +45,26 @@ export default function BlockByHeightPage() {
   if (Number.isNaN(height) || height < 0) {
     return (
       <div className="space-y-4">
-        <Link href="/" className="text-network-cyan hover:underline text-sm">← Home</Link>
-        <p className="text-red-400">Invalid block height.</p>
+        <Link href="/" className="text-sm text-network-cyan hover:underline">
+          ← Home
+        </Link>
+        <p className="text-red-400" role="alert">
+          Invalid block height.
+        </p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <Link href="/" className="text-network-cyan hover:underline text-sm">← Home</Link>
-
-      <h1 className="font-display text-xl font-bold text-[var(--text-primary)] sm:text-2xl">
-        Block #{height.toLocaleString()}
-      </h1>
+      <header className="space-y-2">
+        <Link href="/" className="text-sm text-network-cyan hover:underline">
+          ← Home
+        </Link>
+        <h1 className="font-display text-xl font-bold text-[var(--text-primary)] sm:text-2xl">
+          Block #{height.toLocaleString()}
+        </h1>
+      </header>
 
       {loading && (
         <div className="space-y-4 animate-pulse" aria-busy="true">
@@ -69,7 +76,11 @@ export default function BlockByHeightPage() {
       {error && <p className="text-amber-300" role="alert">{error}</p>}
       {!loading && !error && !block && <p className="text-[var(--text-muted)]">Block not found.</p>}
 
-      {block && <BlockDetails block={block} network={network} explainerVariant="by-height" />}
+      {block ? (
+        <section aria-label="Block details and transactions">
+          <BlockDetails block={block} network={network} explainerVariant="by-height" />
+        </section>
+      ) : null}
     </div>
   );
 }

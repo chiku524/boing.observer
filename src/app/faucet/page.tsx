@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useNetwork } from "@/context/network-context";
 import { NETWORK_FAUCET_URL, NETWORK_TESTNET_URL } from "@/lib/constants";
@@ -15,7 +15,8 @@ export default function FaucetPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleRequest() {
+  async function handleRequest(e?: FormEvent) {
+    e?.preventDefault();
     setError(null);
     setResult(null);
     const hex = toPrefixedHex64(accountId);
@@ -43,7 +44,7 @@ export default function FaucetPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="mx-auto max-w-2xl space-y-8">
       <nav aria-label="Breadcrumb" className="text-sm">
         <ol className="flex flex-wrap items-center gap-2 text-[var(--text-muted)]">
           <li>
@@ -64,28 +65,16 @@ export default function FaucetPage() {
 
       <header>
         <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
-          Testnet Faucet Helper
+          Testnet faucet helper
         </h1>
         <p className="mt-2 text-[var(--text-secondary)]">
-          Send a direct testnet faucet RPC request for gas and staking. 1,000 per request; rate limit 1 per 60 seconds per account. Uses <code className="px-1.5 py-0.5 rounded bg-white/10 text-sm">boing_faucetRequest</code>.
-        </p>
-        <p className="mt-2 text-sm text-[var(--text-muted)]">
-          Explorer-side helper only — prefer the{" "}
-          <a
-            href={NETWORK_FAUCET_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-network-cyan hover:underline"
-          >
+          Calls <code className="rounded bg-white/10 px-1.5 py-0.5 text-sm">boing_faucetRequest</code> — 1,000
+          BOING per request, max once per 60s per account. Prefer the{" "}
+          <a href={NETWORK_FAUCET_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">
             public faucet
           </a>{" "}
           or{" "}
-          <a
-            href={NETWORK_TESTNET_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-network-cyan hover:underline"
-          >
+          <a href={NETWORK_TESTNET_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">
             testnet hub
           </a>{" "}
           for onboarding.
@@ -98,10 +87,10 @@ export default function FaucetPage() {
         </div>
       )}
 
-      <div className="glass-card space-y-4 p-4 sm:p-6">
+      <form className="glass-card space-y-4 p-4 sm:p-6" onSubmit={(e) => void handleRequest(e)} noValidate>
         <div>
-          <label htmlFor="account-id" className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-            Your account ID (32-byte hex)
+          <label htmlFor="account-id" className="mb-1 block text-sm font-medium text-[var(--text-secondary)]">
+            Account ID (32-byte hex)
           </label>
           <input
             id="account-id"
@@ -110,17 +99,18 @@ export default function FaucetPage() {
             onChange={(e) => setAccountId(e.target.value)}
             placeholder="0x..."
             maxLength={66}
-            className="w-full font-mono text-sm p-3 rounded-lg bg-boing-navy-mid border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-network-cyan/50"
+            autoComplete="off"
+            className="w-full rounded-lg border border-[var(--border-color)] bg-boing-navy-mid p-3 font-mono text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-network-cyan/50"
           />
         </div>
         <button
-          onClick={handleRequest}
+          type="submit"
           disabled={loading || network === "mainnet"}
-          className="px-4 py-2 rounded-lg bg-network-cyan text-boing-black font-semibold hover:bg-network-cyan-light disabled:opacity-60 disabled:cursor-not-allowed"
+          className="rounded-lg bg-network-cyan px-4 py-2 font-semibold text-boing-black hover:bg-network-cyan-light disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "Requesting…" : "Request 1,000 testnet BOING"}
         </button>
-      </div>
+      </form>
 
       {error && (
         <div className="glass-card border-amber-500/40 bg-amber-950/20 p-4 text-amber-200" role="alert">
@@ -129,24 +119,21 @@ export default function FaucetPage() {
       )}
 
       {result && !error && (
-        <div
-          className={`glass-card p-6 ${
+        <output
+          className={`block glass-card p-6 ${
             result.ok ? "border-green-500/40 bg-green-950/20" : "border-amber-500/40 bg-amber-950/20"
           }`}
+          aria-live="polite"
         >
           {result.ok ? (
             <p className="text-green-200">
-              Success! {result.amount ?? "1,000"} testnet BOING sent. {result.message ?? ""}
+              {result.amount ?? "1,000"} testnet BOING sent. {result.message ?? ""}
             </p>
           ) : (
             <p className="text-amber-200">{result.message ?? "Request completed; check your wallet."}</p>
           )}
-        </div>
+        </output>
       )}
-
-      <p className="text-sm text-[var(--text-muted)]">
-        Your account ID is the 32-byte hex public key from your wallet. Rate limit: one request per 60 seconds per account.
-      </p>
     </div>
   );
 }

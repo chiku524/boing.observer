@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useNetwork } from "@/context/network-context";
 import { QA_DOC_URL } from "@/lib/constants";
@@ -31,7 +31,8 @@ export default function QaCheckPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleCheck() {
+  async function handleCheck(e?: FormEvent) {
+    e?.preventDefault();
     setError(null);
     setResult(null);
     const hex = bytecode.trim();
@@ -62,7 +63,7 @@ export default function QaCheckPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="mx-auto max-w-2xl space-y-8">
       <nav aria-label="Breadcrumb" className="text-sm">
         <ol className="flex flex-wrap items-center gap-2 text-[var(--text-muted)]">
           <li>
@@ -82,17 +83,14 @@ export default function QaCheckPage() {
       </nav>
 
       <header>
-        <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
-          QA pre-flight
-        </h1>
-        <p className="mt-2 text-[var(--text-secondary)] max-w-2xl">
-          Verify bytecode with <code className="px-1.5 py-0.5 rounded bg-white/10 text-sm">boing_qaCheck</code> before you
-          deploy. Optional fields match the current protocol QA shape (purpose, description hash, asset metadata when used
-          together).
+        <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">QA pre-flight</h1>
+        <p className="mt-2 max-w-2xl text-[var(--text-secondary)]">
+          Dry-run <code className="rounded bg-white/10 px-1.5 py-0.5 text-sm">boing_qaCheck</code> before deploy. Optional
+          fields mirror the live RPC parameter order.
         </p>
       </header>
 
-      <div className="glass-card space-y-4 p-4 sm:p-6">
+      <form className="glass-card space-y-4 p-4 sm:p-6" onSubmit={(e) => void handleCheck(e)} noValidate>
         <div>
           <label htmlFor="bytecode" className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
             Hex bytecode (required)
@@ -136,9 +134,6 @@ export default function QaCheckPage() {
             placeholder="0x..."
             className="w-full font-mono text-sm p-3 rounded-lg bg-boing-navy-mid border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-network-cyan/50"
           />
-          <p className="mt-2 text-xs text-[var(--text-muted)]">
-            Use when your deployment flow already includes a purpose description hash. This keeps the pre-flight request aligned with the current Boing QA docs.
-          </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
@@ -168,17 +163,14 @@ export default function QaCheckPage() {
             />
           </div>
         </div>
-        <p className="text-xs text-[var(--text-muted)]">
-          Asset fields are passed only when a description hash is also provided, because the RPC accepts these as later optional metadata parameters.
-        </p>
         <button
-          onClick={handleCheck}
+          type="submit"
           disabled={loading}
-          className="px-4 py-2 rounded-lg bg-network-cyan text-boing-black font-semibold hover:bg-network-cyan-light disabled:opacity-60 disabled:cursor-not-allowed"
+          className="rounded-lg bg-network-cyan px-4 py-2 font-semibold text-boing-black hover:bg-network-cyan-light disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "Checking…" : "Check"}
         </button>
-      </div>
+      </form>
 
       {error && (
         <div className="glass-card border-amber-500/40 bg-amber-950/20 p-4 text-amber-200" role="alert">
@@ -187,16 +179,17 @@ export default function QaCheckPage() {
       )}
 
       {result && (
-        <div
-          className={`glass-card p-6 ${
+        <output
+          className={`block glass-card p-6 ${
             result.result === "allow"
               ? "border-green-500/40 bg-green-950/20"
               : result.result === "reject"
                 ? "border-red-500/40 bg-red-950/20"
                 : "border-amber-500/40 bg-amber-950/20"
           }`}
+          aria-live="polite"
         >
-          <h2 className="font-display text-lg font-semibold text-[var(--text-primary)] mb-2">
+          <h2 className="mb-2 font-display text-lg font-semibold text-[var(--text-primary)]">
             Result: {result.result.toUpperCase()}
           </h2>
           {result.rule_id && (
@@ -225,16 +218,19 @@ export default function QaCheckPage() {
               This deployment would go to the community QA pool for review.
             </p>
           )}
-        </div>
+        </output>
       )}
 
-      <p className="text-sm text-[var(--text-muted)]">
-        Purpose categories include dApp, token, NFT, meme, community, entertainment, tooling, and other. Full policy:{" "}
+      <footer className="text-sm text-[var(--text-muted)]">
+        Policy:{" "}
         <a href={QA_DOC_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">
-          QA rules and guidance
+          QA docs
         </a>
-        . Live pool status: <Link href="/qa" className="text-network-cyan hover:underline">QA transparency</Link>.
-      </p>
+        {" · "}
+        <Link href="/qa" className="text-network-cyan hover:underline">
+          Pool status
+        </Link>
+      </footer>
     </div>
   );
 }

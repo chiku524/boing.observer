@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="space-y-10 max-w-3xl">
+    <article className="mx-auto max-w-3xl space-y-10">
       <nav aria-label="Breadcrumb" className="text-sm">
         <ol
           className="flex items-center gap-2 text-[var(--text-muted)]"
@@ -44,15 +44,13 @@ export default function AboutPage() {
           About Boing Network
         </h1>
         <p className="mt-2 text-[var(--text-secondary)]">
-          Boing Network — <em>Authentic. Decentralized. Optimal. Quality-Assured.</em>
-        </p>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Six pillars guide design and operations: Security, Scalability, Decentralization, Authenticity, Transparency, True Quality Assurance.
+          <em>Authentic. Decentralized. Optimal. Quality-Assured.</em> — six pillars: Security, Scalability,
+          Decentralization, Authenticity, Transparency, True QA.
         </p>
       </header>
 
-      <section className="space-y-6">
-        <h2 className="font-display text-xl font-semibold text-[var(--text-primary)]">
+      <section className="space-y-6" aria-labelledby="pillars-heading">
+        <h2 id="pillars-heading" className="font-display text-xl font-semibold text-[var(--text-primary)]">
           Six pillars
         </h2>
         <div className="space-y-6">
@@ -138,23 +136,18 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="glass-card p-5 sm:p-6">
-        <h2 className="font-display text-xl font-semibold text-[var(--text-primary)] mb-4">
-          Boing Observer
+      <section className="glass-card p-5 sm:p-6" aria-labelledby="explorer-heading">
+        <h2 id="explorer-heading" className="mb-3 font-display text-xl font-semibold text-[var(--text-primary)]">
+          This explorer
         </h2>
-        <p className="text-[var(--text-secondary)] leading-relaxed">
-          The explorer for Boing Network: search by block height, hash, or account; browse testnet today; mainnet appears
-          when a separate RPC is configured. Use the header for Wallet, public Faucet, QA, and{" "}
+        <p className="leading-relaxed text-[var(--text-secondary)]">
+          Search by height, 64-character hex (tx id, block hash, or account), or use{" "}
           <Link href="/tools" className="text-network-cyan hover:underline">
             Tools
-          </Link>{" "}
-          (RPC helpers).{" "}
-          <Link href="/" className="text-network-cyan hover:underline">
-            Back to home
           </Link>
-          .
+          . <Link href="/" className="text-network-cyan hover:underline">Home</Link>
         </p>
       </section>
-    </div>
+    </article>
   );
 }

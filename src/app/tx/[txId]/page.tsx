@@ -70,8 +70,7 @@ export default function TransactionByIdPage() {
           ← Home
         </Link>
         <p className="text-red-400" role="alert">
-          Invalid transaction id (must be 64 hex characters, same id returned by{" "}
-          <span className="font-mono">boing_getTransactionReceipt</span>).
+          Invalid transaction id (64 hex characters).
         </p>
       </div>
     );
@@ -101,12 +100,9 @@ export default function TransactionByIdPage() {
       </Link>
 
       <header className="space-y-3">
-        <h1 className="font-display text-xl font-bold text-[var(--text-primary)] sm:text-2xl">
-          Transaction
-        </h1>
-        <p className="max-w-2xl text-sm leading-relaxed text-[var(--text-muted)]">
-          32-byte signable payload hash (Boing tx id). Block hash uses the same length — search tries a
-          transaction receipt first when you paste 64 hex characters.
+        <h1 className="font-display text-xl font-bold text-[var(--text-primary)] sm:text-2xl">Transaction</h1>
+        <p className="max-w-xl text-sm text-[var(--text-muted)]">
+          Signable payload id (64 hex). Search prefers this over block hash when both could match.
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <p className="hash break-all text-sm text-[var(--text-secondary)]">{txId}</p>
@@ -142,12 +138,11 @@ export default function TransactionByIdPage() {
 
       {!loading && !error && receipt === null ? (
         <p className="text-[var(--text-muted)]">
-          No transaction receipt for this id on the selected network. It may be unknown, pruned, or a block
-          hash rather than a tx id — try opening it as a{" "}
+          No receipt for this id. Try{" "}
           <Link href={`/block/hash/${txId}?network=${network}`} className="text-network-cyan hover:underline">
-            block by hash
-          </Link>{" "}
-          or{" "}
+            block
+          </Link>
+          {" or "}
           <Link href={`/account/${txId}?network=${network}`} className="text-network-cyan hover:underline">
             account
           </Link>
@@ -157,17 +152,16 @@ export default function TransactionByIdPage() {
 
       {!loading && !error && receipt != null && height == null ? (
         <p className="text-[var(--text-muted)]">
-          A receipt was returned without a <span className="font-mono">block_height</span> field, so the
-          signed transaction payload cannot be shown here. Check your RPC node version or try another
-          endpoint.
+          Receipt has no <span className="font-mono">block_height</span> — upgrade or switch RPC to load the
+          signed payload here.
         </p>
       ) : null}
 
       {!loading && !error && receipt != null && block === null && height != null ? (
         <p className="text-[var(--text-muted)]">
-          Receipt references block #{height}, but that block was not returned by the node. Try again or open{" "}
+          Block #{height} not returned —{" "}
           <Link href={`/block/${height}?network=${network}`} className="text-network-cyan hover:underline">
-            block #{height}
+            retry
           </Link>
           .
         </p>
@@ -175,13 +169,12 @@ export default function TransactionByIdPage() {
 
       {!loading && !error && receipt != null && block != null && tx == null ? (
         <p className="text-[var(--text-muted)]" role="status">
-          Block loaded, but no transaction at receipt index{" "}
-          <span className="font-mono">{String(txIndex)}</span>. The node may have returned an inconsistent
-          receipt.
+          No transaction at index <span className="font-mono">{String(txIndex)}</span>.
         </p>
       ) : null}
 
       {!loading && !error && tx != null && typeof txIndex === "number" && height != null ? (
+        <section aria-label="Transaction details">
         <TransactionInsight
           tx={tx}
           index={txIndex}
@@ -191,6 +184,7 @@ export default function TransactionByIdPage() {
           visualScale="featured"
           blockPlacement={{ height, txIndex }}
         />
+        </section>
       ) : null}
     </div>
   );

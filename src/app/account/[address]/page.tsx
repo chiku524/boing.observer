@@ -48,25 +48,30 @@ export default function AccountPage() {
   if (!isHex64(address)) {
     return (
       <div className="space-y-4">
-        <Link href="/" className="text-network-cyan hover:underline text-sm">← Home</Link>
-        <p className="text-red-400">Invalid account address (must be 32-byte hex, 64 characters).</p>
+        <Link href="/" className="text-sm text-network-cyan hover:underline">
+          ← Home
+        </Link>
+        <p className="text-red-400" role="alert">
+          Invalid account address (32-byte hex, 64 characters).
+        </p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <Link href="/" className="text-network-cyan hover:underline text-sm">← Home</Link>
-
-      <h1 className="font-display text-xl font-bold text-[var(--text-primary)] sm:text-2xl">
-        Account
-      </h1>
-      <div className="flex items-center gap-2 flex-wrap">
-        <p className="hash text-sm text-[var(--text-muted)] break-all font-mono" title={address}>
-          0x{address}
-        </p>
-        <CopyButton value={toPrefixedHex64(address)} label="Copy address" />
-      </div>
+      <header className="space-y-3">
+        <Link href="/" className="text-sm text-network-cyan hover:underline">
+          ← Home
+        </Link>
+        <h1 className="font-display text-xl font-bold text-[var(--text-primary)] sm:text-2xl">Account</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="hash break-all font-mono text-sm text-[var(--text-muted)]" title={address}>
+            0x{address}
+          </p>
+          <CopyButton value={toPrefixedHex64(address)} label="Copy address" />
+        </div>
+      </header>
 
       {loading && (
         <div className="space-y-4 animate-pulse" aria-busy="true">
@@ -77,29 +82,24 @@ export default function AccountPage() {
       {error && <p className="text-amber-300" role="alert">{error}</p>}
 
       {!loading && !error && account && (
-        <div className="glass-card space-y-4 p-4 sm:p-6">
-          <h2 className="font-display text-lg font-semibold text-[var(--text-primary)]">Balance &amp; state</h2>
+        <section className="glass-card space-y-4 p-4 sm:p-6" aria-labelledby="account-state-heading">
+          <h2 id="account-state-heading" className="font-display text-lg font-semibold text-[var(--text-primary)]">
+            On-chain state
+          </h2>
           <dl className="grid gap-3 text-sm">
             <div className="flex flex-wrap gap-x-2">
-              <dt className="text-[var(--text-muted)]">Balance (BOING)</dt>
-              <dd className="font-mono text-network-cyan font-medium">
-                {formatBalance(account.balance)}
-              </dd>
+              <dt className="text-[var(--text-muted)]">Balance</dt>
+              <dd className="font-mono font-medium text-network-cyan">{formatBalance(account.balance)} BOING</dd>
             </div>
             <div className="flex flex-wrap gap-x-2">
               <dt className="text-[var(--text-muted)]">Nonce</dt>
               <dd className="font-mono">{account.nonce}</dd>
             </div>
             <div className="flex flex-wrap gap-x-2">
-              <dt className="text-[var(--text-muted)]">Stake (BOING)</dt>
-              <dd className="font-mono text-network-cyan">
-                {formatBalance(account.stake)}
-              </dd>
+              <dt className="text-[var(--text-muted)]">Stake</dt>
+              <dd className="font-mono text-network-cyan">{formatBalance(account.stake)} BOING</dd>
             </div>
           </dl>
-          <p className="text-xs text-[var(--text-muted)] mt-2">
-            Balances and stake are on-chain u128 amounts in whole BOING (same units as the node RPC).
-          </p>
           {network === "testnet" && (
             <p className="text-sm mt-3">
               <a
@@ -112,7 +112,7 @@ export default function AccountPage() {
               </a>
             </p>
           )}
-        </div>
+        </section>
       )}
     </div>
   );

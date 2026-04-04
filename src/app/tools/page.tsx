@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function ToolsPage() {
   return (
-    <div className="space-y-10 max-w-3xl">
+    <div className="mx-auto max-w-3xl space-y-10">
       <nav aria-label="Breadcrumb" className="text-sm">
         <ol className="flex items-center gap-2 text-[var(--text-muted)]">
           <li>
@@ -28,8 +28,8 @@ export default function ToolsPage() {
         <h1 className="font-display text-3xl font-bold tracking-tight text-[var(--text-primary)]">
           Developer tools
         </h1>
-        <p className="mt-2 text-[var(--text-secondary)] max-w-2xl">
-          Advanced JSON-RPC helpers that run from the explorer. For the public faucet and onboarding, use{" "}
+        <p className="mt-2 max-w-2xl text-[var(--text-secondary)]">
+          JSON-RPC helpers in the browser. Public onboarding:{" "}
           <a
             href={NETWORK_FAUCET_URL}
             target="_blank"
@@ -42,7 +42,11 @@ export default function ToolsPage() {
         </p>
       </header>
 
-      <ul className="grid gap-4 sm:grid-cols-2">
+      <nav aria-labelledby="tools-nav-heading">
+        <p id="tools-nav-heading" className="sr-only">
+          Available tools
+        </p>
+        <ul className="grid gap-4 sm:grid-cols-2">
         <li>
           <Link
             href="/faucet"
@@ -68,13 +72,10 @@ export default function ToolsPage() {
           </Link>
         </li>
       </ul>
+      </nav>
 
       <p className="text-sm text-[var(--text-muted)]">
-        Live governance QA pool and registry are on{" "}
-        <Link href="/qa" className="text-network-cyan hover:underline">
-          QA transparency
-        </Link>
-        .
+        Live pool: <Link href="/qa" className="text-network-cyan hover:underline">QA transparency</Link>
       </p>
     </div>
   );

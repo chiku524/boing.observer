@@ -47,27 +47,29 @@ export default function BlockByHashPage() {
   if (!isHex64(hashParam || "")) {
     return (
       <div className="space-y-4">
-        <Link href="/" className="text-network-cyan hover:underline text-sm">← Home</Link>
-        <p className="text-red-400">Invalid block hash (must be 64 hex characters).</p>
+        <Link href="/" className="text-sm text-network-cyan hover:underline">
+          ← Home
+        </Link>
+        <p className="text-red-400" role="alert">
+          Invalid block hash (64 hex characters).
+        </p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <Link href="/" className="text-network-cyan hover:underline text-sm">← Home</Link>
-
-      <h1 className="font-display text-xl font-bold text-[var(--text-primary)] sm:text-2xl">
-        Block by hash
-      </h1>
-      <p className="text-sm text-[var(--text-muted)] -mt-2">
-        BLAKE3 block identifier — not an EVM-style transaction hash. On-chain transfers appear in the
-        transactions table below.
-      </p>
-      <div className="flex items-center gap-2 flex-wrap">
-        <p className="hash text-sm text-[var(--text-muted)] break-all">{hash}</p>
-        <CopyButton value={`0x${hash}`} label="Copy hash" />
-      </div>
+      <header className="space-y-3">
+        <Link href="/" className="text-sm text-network-cyan hover:underline">
+          ← Home
+        </Link>
+        <h1 className="font-display text-xl font-bold text-[var(--text-primary)] sm:text-2xl">Block by hash</h1>
+        <p className="max-w-2xl text-sm text-[var(--text-muted)]">BLAKE3 block id (64 hex). Transfers live under Transactions.</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="hash break-all text-sm text-[var(--text-secondary)]">{hash}</p>
+          <CopyButton value={`0x${hash}`} label="Copy hash" />
+        </div>
+      </header>
 
       {loading && (
         <div className="space-y-4 animate-pulse" aria-busy="true">
@@ -79,7 +81,11 @@ export default function BlockByHashPage() {
       {error && <p className="text-amber-300" role="alert">{error}</p>}
       {!loading && !error && !block && <p className="text-[var(--text-muted)]">Block not found.</p>}
 
-      {block && <BlockDetails block={block} network={network} explainerVariant="by-hash" />}
+      {block ? (
+        <section aria-label="Block details and transactions">
+          <BlockDetails block={block} network={network} explainerVariant="by-hash" />
+        </section>
+      ) : null}
     </div>
   );
 }
