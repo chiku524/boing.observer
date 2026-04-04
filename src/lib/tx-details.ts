@@ -4,7 +4,7 @@
 
 import type { TxPayloadKind } from "./rpc-types";
 import { hexForLink, shortenHash, toSafeHexString } from "./rpc-types";
-import { formatBoingAmount, getTxPayloadKind } from "./tx-payload";
+import { formatBoingAmount, getTxPayloadKind, getTxPayloadInner } from "./tx-payload";
 
 export type TxDetailLine = {
   label: string;
@@ -34,7 +34,7 @@ export function hexPreview(prefixed: string, maxHexChars = 48): string {
 
 export function buildPayloadDetailLines(payload: unknown): TxDetailLine[] {
   const kind = getTxPayloadKind(payload);
-  const p = payload as Record<string, unknown>;
+  const p = getTxPayloadInner(payload);
   const lines: TxDetailLine[] = [];
 
   switch (kind) {

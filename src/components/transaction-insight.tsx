@@ -6,7 +6,9 @@ import { hexForLink, shortenHash, toPrefixedHex64, normalizeHex64 } from "@/lib/
 import {
   formatBoingAmount,
   getTxExplorerNarrative,
+  getTxPayloadInner,
   getTxPayloadKind,
+  getSignedPayloadHeadline,
   getTxPayloadSummary,
 } from "@/lib/tx-payload";
 import {
@@ -376,18 +378,14 @@ export function TransactionInsight({
   const summary = getTxPayloadSummary(tx.payload);
   const narrative = getTxExplorerNarrative(tx.sender, tx.payload);
   const sender = hexForLink(tx.sender);
+  const payloadInner = getTxPayloadInner(tx.payload);
+  const signedHeadline = getSignedPayloadHeadline(kind, payloadInner);
   const detailLines = buildPayloadDetailLines(tx.payload);
   const featured = visualScale === "featured";
 
   const isFaucetTransfer =
     kind === "Transfer" && sender === TESTNET_FAUCET_ACCOUNT_HEX.toLowerCase();
   const showContextNote = kind === "Unknown" || isDeployPayloadKind(kind) || isFaucetTransfer;
-
-  const redundantPayloadDetails =
-    kind === "Transfer" ||
-    kind === "Bond" ||
-    kind === "Unbond" ||
-    (kind === "ContractCall" && featured);
 
   return (
     <article
@@ -434,56 +432,75 @@ export function TransactionInsight({
       {kind === "Transfer" ? (
         <TransferFlowDiagram
           sender={tx.sender}
-          payload={tx.payload}
+          payload={payloadInner}
           network={network}
           scale={visualScale}
         />
       ) : null}
       {featured && kind === "Bond" ? (
-        <StakeMovementVisual kind="Bond" sender={tx.sender} payload={tx.payload} network={network} />
+        <StakeMovementVisual kind="Bond" sender={tx.sender} payload={payloadInner} network={network} />
       ) : null}
       {featured && kind === "Unbond" ? (
-        <StakeMovementVisual kind="Unbond" sender={tx.sender} payload={tx.payload} network={network} />
+        <StakeMovementVisual kind="Unbond" sender={tx.sender} payload={payloadInner} network={network} />
       ) : null}
       {featured && kind === "ContractCall" ? (
-        <ContractCallFeaturedVisual payload={tx.payload} network={network} />
+        <ContractCallFeaturedVisual payload={payloadInner} network={network} />
       ) : null}
 
       {showContextNote ? (
         <p className="text-sm leading-snug text-[var(--text-secondary)]">{narrative}</p>
       ) : null}
 
-      {detailLines.length > 0 && !redundantPayloadDetails ? (
-        <div>
-          <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-            Payload details
+      {kind !== "Unknown" && signedHeadline ? (
+        <div className="rounded-xl border border-network-primary/35 bg-gradient-to-br from-network-primary/[0.12] via-boing-navy-mid/50 to-boing-black/40 p-4 sm:p-5">
+          <h4 className="font-display text-xs font-semibold uppercase tracking-[0.15em] text-network-primary-light/90">
+            What you signed
           </h4>
-          <dl className="mt-2 space-y-3">
-            {detailLines.map((row) => (
-              <div key={row.label} className="flex flex-col gap-1 sm:flex-row sm:gap-4">
-                <dt className="shrink-0 text-xs font-medium uppercase tracking-wide text-[var(--text-muted)] sm:w-36">
-                  {row.label}
-                </dt>
-                <dd className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    {row.accountHex64 ? (
-                      <Link
-                        href={`/account/${row.accountHex64}?network=${network}`}
-                        className="hash text-sm text-network-cyan hover:underline"
-                      >
-                        {row.value}
-                      </Link>
-                    ) : (
-                      <span className="hash break-all text-sm text-[var(--text-primary)]">{row.value}</span>
-                    )}
-                    {row.copyValue ? <CopyButton value={row.copyValue} label={`Copy ${row.label}`} /> : null}
+          <p className="mt-3 text-sm leading-relaxed text-[var(--text-primary)] sm:text-[0.95rem]">
+            {signedHeadline}
+          </p>
+          {detailLines.length > 0 ? (
+            <>
+              <h5 className="mt-4 font-display text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                Payload fields
+              </h5>
+              <dl className="mt-2 space-y-2.5 border-t border-[var(--border-color)]/60 pt-3">
+                {detailLines.map((row) => (
+                  <div key={row.label} className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
+                    <dt className="shrink-0 text-xs font-medium uppercase tracking-wide text-[var(--text-muted)] sm:w-36">
+                      {row.label}
+                    </dt>
+                    <dd className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {row.accountHex64 ? (
+                          <Link
+                            href={`/account/${row.accountHex64}?network=${network}`}
+                            className="hash text-sm text-network-cyan hover:underline"
+                          >
+                            {row.value}
+                          </Link>
+                        ) : (
+                          <span className="hash break-all text-sm text-[var(--text-primary)]">{row.value}</span>
+                        )}
+                        {row.copyValue ? <CopyButton value={row.copyValue} label={`Copy ${row.label}`} /> : null}
+                      </div>
+                    </dd>
                   </div>
-                </dd>
-              </div>
-            ))}
-          </dl>
+                ))}
+              </dl>
+            </>
+          ) : null}
         </div>
-      ) : null}
+      ) : (
+        <div
+          className="rounded-lg border border-[var(--border-color)] bg-boing-navy-mid/30 p-4 text-sm text-[var(--text-secondary)]"
+          role="status"
+        >
+          This payload is not a known Boing shape (flat or tagged). Open{" "}
+          <strong className="text-[var(--text-primary)]">Exact payload (JSON)</strong> below for the bytes the node
+          returned.
+        </div>
+      )}
 
       <AccessListPanel tx={tx} />
 
@@ -506,7 +523,7 @@ export function TransactionInsight({
 
       <details className="rounded-lg border border-[var(--border-color)] bg-boing-black/30">
         <summary className="cursor-pointer select-none px-3 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-white/5">
-          Raw JSON
+          Exact payload (JSON)
         </summary>
         <pre className="max-h-[min(320px,50vh)] overflow-auto border-t border-[var(--border-color)] p-3 text-xs text-[var(--text-secondary)] hash">
           {JSON.stringify(tx.payload, null, 2)}
