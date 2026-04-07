@@ -5,89 +5,261 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@600;700;900&display=swap');
 
 :root {
-  /* Cosmic Foundation — aligned with boing.network docs/BOING-DESIGN-SYSTEM.md §5 */
-  --boing-black: #020408;
-  --boing-navy: #0c1428;
-  --boing-navy-mid: #0d1f3c;
-  --boing-navy-deep: #060f1e;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  color-scheme: dark;
+  /* Canvas / surfaces — aligned with https://colloseum-hackathon.vercel.app/ */
+  --canvas-bg: #070a0e;
+  --canvas-stone-deep: #06080c;
+  --canvas-stone-mid: #0c1018;
+  --canvas-stone-vein-end: #121a24;
+  --canvas-surface: #0f1419;
+  --canvas-surface-2: #151c24;
+  --canvas-border: #243042;
+  --canvas-border-subtle: #1a2430;
+  /* Legacy aliases (used across components) */
+  --boing-black: #06080c;
+  --boing-navy: #0c1018;
+  --boing-navy-mid: #121a24;
+  --boing-navy-deep: #06080c;
+  --text-primary: #e9eef5;
+  --text-secondary: #8b9cb0;
+  --text-muted: #6b7c90;
+  --border-color: rgba(36, 48, 66, 0.55);
+  --border-hover: rgba(61, 139, 212, 0.45);
+  /* Brand accents (links, highlights) */
   --network-primary: #7c3aed;
-  --network-primary-light: #a78bfa;
-  --network-cyan: #06b6d4;
-  --network-cyan-light: #22d3ee;
-  --network-aurora: #0ea5e9;
-  --network-nebula: #c026d3;
+  --network-primary-light: #b894f5;
+  --network-cyan: #4a9fe8;
+  --network-cyan-light: #8ec7ff;
+  --network-aurora: #5ab0ff;
+  --network-nebula: #9f8fff;
   --network-gold: #fbbf24;
-  --border-color: rgba(124, 58, 237, 0.18);
-  --border-hover: rgba(124, 58, 237, 0.45);
-  /* Stone + engraving backdrop (see AppStoneBackground) */
-  --stone-base: #060910;
-  --stone-mid: #0b121f;
-  --stone-vein: rgba(148, 163, 184, 0.04);
+  --link-accent: #8ec7ff;
 }
 
-/* Stone slab + grain + etch on body so every route and scroll position matches (see AppStoneBackground for neon layer). */
+html {
+  min-height: 100%;
+}
+
+/* Body: base fill only; full slab + static neon live in AppEngraveBackground (scrolls with content). */
 body.app-page-canvas {
+  margin: 0;
+  position: relative;
   color: var(--text-primary);
   font-family: 'Inter', sans-serif;
+  line-height: 1.5;
   min-height: 100vh;
-  background-color: var(--stone-base);
-  background-image:
-    repeating-linear-gradient(
-      105deg,
-      transparent,
-      transparent 2px,
-      var(--stone-vein) 2px,
-      var(--stone-vein) 3px
-    ),
-    repeating-linear-gradient(
-      -18deg,
-      transparent,
-      transparent 64px,
-      rgba(6, 182, 212, 0.022) 64px,
-      rgba(6, 182, 212, 0.022) 65px
-    ),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.14'/%3E%3C/svg%3E"),
-    radial-gradient(ellipse 130% 55% at 50% -20%, rgba(124, 58, 237, 0.1), transparent 52%),
-    radial-gradient(ellipse 85% 50% at 100% 8%, rgba(6, 182, 212, 0.06), transparent 48%),
-    radial-gradient(ellipse 75% 40% at 0% 92%, rgba(192, 38, 211, 0.05), transparent 46%),
-    linear-gradient(165deg, var(--stone-mid) 0%, var(--stone-base) 45%, #05080e 100%);
-  background-attachment: fixed;
+  background: var(--canvas-stone-deep);
 }
 
-.app-stone-vignette {
-  background: radial-gradient(ellipse 85% 70% at 50% 45%, transparent 30%, rgba(0, 0, 0, 0.55) 100%);
+/* --- Engrave stack (Colosseum-style) --- */
+.app-shell-root {
+  position: relative;
+  min-height: 100%;
+  isolation: isolate;
+}
+
+.app-engrave-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 
-.app-bg-path-groove {
-  stroke: rgba(148, 163, 184, 0.11);
+.app-engrave-stone {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 100% 55% at 15% -5%, rgba(55, 68, 88, 0.22), transparent 52%),
+    radial-gradient(ellipse 80% 50% at 92% 12%, rgba(40, 48, 62, 0.18), transparent 48%),
+    radial-gradient(ellipse 70% 45% at 8% 88%, rgba(35, 42, 54, 0.2), transparent 50%),
+    radial-gradient(ellipse 90% 60% at 78% 96%, rgba(48, 58, 72, 0.15), transparent 55%),
+    linear-gradient(
+      168deg,
+      var(--canvas-stone-deep) 0%,
+      var(--canvas-stone-mid) 42%,
+      var(--canvas-stone-vein-end) 100%
+    );
 }
 
-.app-bg-branch-opacity {
-  opacity: 0.72;
+.app-engrave-stone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background-image: repeating-linear-gradient(
+    -18deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.045) 2px,
+    rgba(0, 0, 0, 0.045) 3px
+  );
+  mix-blend-mode: multiply;
 }
 
-.app-bg-node-fill {
-  fill: rgba(34, 211, 238, 0.35);
-  stroke: rgba(167, 139, 250, 0.45);
-  stroke-width: 0.6;
+.app-engrave-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
 }
 
-@keyframes app-bg-glow-pulse {
-  0%,
-  100% {
-    opacity: 0.88;
-  }
-  50% {
-    opacity: 1;
-  }
+.app-engrave-vein {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.55;
 }
 
-.app-bg-glow-pulse {
-  animation: app-bg-glow-pulse 10s ease-in-out infinite;
+.app-engrave-vein__shadow {
+  transform: translate(0.18%, 0.12%);
+}
+
+.app-engrave-vein__branch {
+  opacity: 0.92;
+}
+
+/* Static neon accents (same shapes as Colosseum reference; motion removed intentionally). */
+.app-neon-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.app-neon {
+  position: absolute;
+}
+
+.app-neon--orb {
+  border-radius: 50%;
+  width: min(28vw, 220px);
+  height: min(28vw, 220px);
+  background: radial-gradient(
+    circle at 35% 35%,
+    color-mix(in srgb, var(--neon-c) 22%, transparent) 0%,
+    color-mix(in srgb, var(--neon-c) 6%, transparent) 42%,
+    transparent 68%
+  );
+  box-shadow:
+    0 0 28px 12px color-mix(in srgb, var(--neon-c) 14%, transparent),
+    0 0 56px 28px color-mix(in srgb, var(--neon-c) 7%, transparent),
+    inset 0 0 22px color-mix(in srgb, var(--neon-c) 8%, transparent);
+  opacity: var(--neon-base-o, 0.55);
+}
+
+.app-neon--a {
+  --neon-c: #4a9fe8;
+  left: 8%;
+  top: 6%;
+  --neon-base-o: 0.45;
+}
+
+.app-neon--b {
+  --neon-c: #7c6cf0;
+  right: 4%;
+  top: 22%;
+  width: min(22vw, 160px);
+  height: min(22vw, 160px);
+  --neon-base-o: 0.38;
+}
+
+.app-neon--c {
+  --neon-c: #5ecf9a;
+  left: 2%;
+  bottom: 12%;
+  width: min(32vw, 240px);
+  height: min(32vw, 240px);
+  --neon-base-o: 0.32;
+}
+
+.app-neon--arc {
+  width: min(42vw, 320px);
+  height: min(42vw, 320px);
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--neon-c) 28%, transparent);
+  background: transparent;
+  box-shadow:
+    0 0 14px 2px color-mix(in srgb, var(--neon-c) 12%, transparent),
+    0 0 32px 8px color-mix(in srgb, var(--neon-c) 6%, transparent),
+    inset 0 0 12px color-mix(in srgb, var(--neon-c) 5%, transparent);
+  opacity: 0.38;
+}
+
+.app-neon--d {
+  --neon-c: #5ab0ff;
+  right: -8%;
+  top: 38%;
+  clip-path: inset(0 48% 48% 0);
+}
+
+.app-neon--e {
+  --neon-c: #b894f5;
+  left: -12%;
+  bottom: 18%;
+  clip-path: inset(48% 0 0 42%);
+  width: min(48vw, 360px);
+  height: min(48vw, 360px);
+  opacity: 0.3;
+}
+
+.app-neon--dash {
+  height: 2px;
+  width: min(36vw, 280px);
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--neon-c) 55%, transparent) 22%,
+    color-mix(in srgb, var(--neon-c) 35%, transparent) 78%,
+    transparent
+  );
+  box-shadow:
+    0 0 10px 3px color-mix(in srgb, var(--neon-c) 18%, transparent),
+    0 0 24px 8px color-mix(in srgb, var(--neon-c) 8%, transparent);
+  opacity: 0.48;
+}
+
+.app-neon--f {
+  --neon-c: #4a9fe8;
+  left: 18%;
+  top: 52%;
+  transform: rotate(-18deg);
+}
+
+.app-neon--g {
+  --neon-c: #6ee0c0;
+  right: 12%;
+  bottom: 28%;
+  width: min(28vw, 200px);
+  transform: rotate(24deg);
+  opacity: 0.4;
+}
+
+.app-neon--dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--neon-c) 75%, white);
+  box-shadow:
+    0 0 8px 3px color-mix(in srgb, var(--neon-c) 35%, transparent),
+    0 0 20px 6px color-mix(in srgb, var(--neon-c) 15%, transparent);
+  opacity: 0.58;
+}
+
+.app-neon--h {
+  --neon-c: #7eb8ff;
+  left: 72%;
+  top: 14%;
+}
+
+.app-neon--i {
+  --neon-c: #9f8fff;
+  left: 42%;
+  bottom: 8%;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -98,28 +270,22 @@ body.app-page-canvas {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-
-  .app-bg-glow-pulse {
-    animation: none;
-    opacity: 0.92;
-  }
-
-  body.app-page-canvas {
-    background-attachment: scroll;
-  }
 }
 
-/* Glass card */
+/* Glass card — panel on stone */
 .glass-card {
-  background: rgba(8, 13, 26, 0.75);
+  background: color-mix(in srgb, var(--canvas-surface) 82%, transparent);
   backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
+
 .glass-card:hover {
   border-color: var(--border-hover);
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--network-cyan) 12%, transparent);
 }
 
 /* Monospace for hashes and addresses */
@@ -137,6 +303,7 @@ body.app-page-canvas {
   color: var(--text-secondary);
   transition: color 0.2s ease;
 }
+
 .nav-link:hover {
   color: var(--text-primary);
 }

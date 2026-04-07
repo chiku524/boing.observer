@@ -10,17 +10,17 @@ const config: Config = {
     extend: {
       colors: {
         boing: {
-          black: "#020408",
-          navy: "#0c1428",
-          "navy-mid": "#0d1f3c",
+          black: "#06080c",
+          navy: "#0c1018",
+          "navy-mid": "#121a24",
         },
         network: {
           primary: "#7c3aed",
-          "primary-light": "#a78bfa",
-          cyan: "#06b6d4",
-          "cyan-light": "#22d3ee",
-          aurora: "#0ea5e9",
-          nebula: "#c026d3",
+          "primary-light": "#b894f5",
+          cyan: "#4a9fe8",
+          "cyan-light": "#8ec7ff",
+          aurora: "#5ab0ff",
+          nebula: "#9f8fff",
           gold: "#fbbf24",
         },
       },
@@ -30,8 +30,8 @@ const config: Config = {
         mono: ["JetBrains Mono", "monospace"],
       },
       boxShadow: {
-        glow: "0 0 20px rgba(124, 58, 237, 0.25)",
-        "glow-cyan": "0 0 20px rgba(6, 182, 212, 0.2)",
+        glow: "0 0 24px rgba(124, 58, 237, 0.22)",
+        "glow-cyan": "0 0 24px rgba(74, 159, 232, 0.2)",
       },
     },
   },

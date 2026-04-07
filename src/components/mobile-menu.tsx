@@ -92,7 +92,7 @@ export function MobileMenu() {
             role="dialog"
             aria-modal="true"
             aria-label="Site navigation and search"
-            className="absolute inset-y-0 right-0 flex w-[min(100vw,22rem)] max-w-full flex-col border-l border-[var(--border-color)] bg-[var(--boing-navy-deep)] shadow-2xl"
+            className="absolute inset-y-0 right-0 flex w-[min(100vw,22rem)] max-w-full flex-col border-l border-[var(--border-color)] bg-[var(--canvas-surface-2)] shadow-2xl"
             style={{
               paddingTop: "max(0.75rem, env(safe-area-inset-top))",
               paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
