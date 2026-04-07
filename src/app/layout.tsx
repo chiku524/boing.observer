@@ -134,12 +134,12 @@ export default function RootLayout({
               <Header />
               <NetworkStatusBanner />
               <main
-                className="mx-auto w-full min-w-0 max-w-7xl overflow-x-hidden px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-8"
+                className="app-main-readable mx-auto w-full min-w-0 max-w-7xl overflow-x-hidden px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-8"
                 id="main-content"
               >
                 {children}
               </main>
-              <footer className="mt-auto border-t border-[var(--border-color)] px-4 py-6 text-center text-xs text-[var(--text-muted)] sm:px-6 sm:text-sm">
+              <footer className="mt-auto border-t border-[var(--nav-border)] bg-[var(--nav-bg)] px-4 py-6 text-center text-xs text-[var(--text-muted)] backdrop-blur-md sm:px-6 sm:text-sm">
                 <p className="mb-2 leading-relaxed">Boing Network — Authentic. Decentralized. Optimal. Quality-Assured.</p>
                 <nav aria-label="Site links" className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 sm:gap-x-4">
                   <a href={WEBSITE_URL} target="_blank" rel="noopener noreferrer" className="text-network-cyan hover:underline">

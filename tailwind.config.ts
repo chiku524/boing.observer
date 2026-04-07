@@ -10,17 +10,17 @@ const config: Config = {
     extend: {
       colors: {
         boing: {
-          black: "#06080c",
-          navy: "#0c1018",
-          "navy-mid": "#121a24",
+          black: "#050c18",
+          navy: "#0a1628",
+          "navy-mid": "#0d1f3c",
         },
         network: {
           primary: "#7c3aed",
-          "primary-light": "#b894f5",
-          cyan: "#4a9fe8",
-          "cyan-light": "#8ec7ff",
-          aurora: "#5ab0ff",
-          nebula: "#9f8fff",
+          "primary-light": "#a78bfa",
+          cyan: "#00e8c8",
+          "cyan-light": "#90e0ef",
+          aurora: "#00b4d8",
+          nebula: "#a78bfa",
           gold: "#fbbf24",
         },
       },
@@ -31,7 +31,7 @@ const config: Config = {
       },
       boxShadow: {
         glow: "0 0 24px rgba(124, 58, 237, 0.22)",
-        "glow-cyan": "0 0 24px rgba(74, 159, 232, 0.2)",
+        "glow-cyan": "0 0 24px rgba(0, 232, 200, 0.22)",
       },
     },
   },

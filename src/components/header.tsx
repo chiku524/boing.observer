@@ -9,13 +9,13 @@ import { SearchBar } from "./search-bar";
 export function Header() {
   return (
     <header
-      className="sticky top-0 z-50 border-b border-[var(--border-color)] bg-boing-black/90 pt-[env(safe-area-inset-top)] backdrop-blur-md"
+      className="sticky top-0 z-50 border-b border-[var(--nav-border)] bg-[var(--nav-bg)] pt-[env(safe-area-inset-top)] backdrop-blur-xl"
       role="banner"
     >
       <div className="mx-auto flex min-h-14 w-full max-w-7xl flex-wrap items-center gap-x-2 gap-y-2 px-4 py-2 sm:gap-x-3 sm:px-6 lg:h-14 lg:flex-nowrap lg:py-0">
         <Link
           href="/"
-          className="min-w-0 shrink-0 font-display text-base font-bold tracking-tight text-[var(--text-primary)] hover:text-network-primary-light transition-colors sm:text-lg"
+          className="min-w-0 shrink-0 font-display text-base font-bold tracking-tight text-[var(--text-primary)] hover:text-network-cyan transition-colors sm:text-lg"
           aria-label="Boing Observer - Home"
         >
           <span aria-hidden>⬡ </span>
