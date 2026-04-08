@@ -113,7 +113,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className="min-h-full">
+    <html lang="en" className="min-h-full font-sans">
       <body className="app-page-canvas min-h-full antialiased">
         <script
           type="application/ld+json"

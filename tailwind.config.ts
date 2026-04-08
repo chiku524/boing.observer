@@ -25,8 +25,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["Orbitron", "sans-serif"],
-        sans: ["Inter", "sans-serif"],
+        sans: ["Comfortaa", "system-ui", "sans-serif"],
+        display: ["Comfortaa", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       boxShadow: {

@@ -15,7 +15,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   return (
-    <html lang="en" className="min-h-full">
+    <html lang="en" className="min-h-full font-sans">
       <body className="app-page-canvas min-h-full antialiased">
         <div className="app-shell-root min-h-screen">
           <AppEngraveBackground />
