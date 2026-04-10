@@ -1,15 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { BlockTransaction, TransactionReceipt } from "@/lib/rpc-types";
 import { hexForLink, shortenHash, toPrefixedHex64, normalizeHex64 } from "@/lib/rpc-types";
+import { explorerAssetHref } from "@/lib/explorer-href";
+import { tryParseCreatedAccountIdFromDeployReturnData } from "@/lib/deploy-receipt";
 import {
   formatBoingAmount,
   getTxExplorerNarrative,
   getTxPayloadInner,
   getTxPayloadKind,
-  getSignedPayloadHeadline,
   getTxPayloadSummary,
+  isContractDeployPayloadKind,
 } from "@/lib/tx-payload";
 import {
   buildPayloadDetailLines,
@@ -23,15 +26,173 @@ import type { TxPayloadKind } from "@/lib/rpc-types";
 
 type VisualScale = "standard" | "featured";
 
-function isDeployPayloadKind(kind: TxPayloadKind): boolean {
+function formatPurposeHeadline(cat: string): string {
+  if (!cat || cat === "other") return "other";
+  return cat.toLowerCase();
+}
+
+function SignedPayloadHeadlineRich({
+  kind,
+  inner,
+  network,
+}: {
+  kind: TxPayloadKind;
+  inner: Record<string, unknown>;
+  network: string;
+}): ReactNode {
+  const amt = (k: string) => formatBoingAmount(String(inner[k] ?? "0"));
   switch (kind) {
+    case "Bond":
+      return (
+        <>
+          You signed a bond (stake) of {amt("amount")} BOING — it moves from liquid balance into validator stake when
+          executed.
+        </>
+      );
+    case "Unbond":
+      return (
+        <>
+          You signed an unbond of {amt("amount")} BOING — stake begins leaving per protocol rules when executed.
+        </>
+      );
+    case "Transfer": {
+      const to = hexForLink(inner.to);
+      const short = to ? shortenHash(to) || to : "—";
+      return (
+        <>
+          You signed a transfer of {amt("amount")} BOING to{" "}
+          {to ? (
+            <Link href={explorerAssetHref(to, network)} className="text-network-cyan hover:underline">
+              {short}
+            </Link>
+          ) : (
+            "—"
+          )}
+          .
+        </>
+      );
+    }
+    case "ContractCall": {
+      const c = hexForLink(inner.contract);
+      const short = c ? shortenHash(c) || c : "—";
+      return (
+        <>
+          You signed a call to contract{" "}
+          {c ? (
+            <Link href={explorerAssetHref(c, network)} className="text-network-cyan hover:underline">
+              {short}
+            </Link>
+          ) : (
+            "—"
+          )}
+          {inner.calldata ? " with calldata" : ""}.
+        </>
+      );
+    }
+    case "ContractDeploy":
+      return <>You signed a contract deployment (bytecode in payload).</>;
+    case "ContractDeployWithPurpose":
+      return (
+        <>
+          You signed a contract deployment with purpose{" "}
+          {formatPurposeHeadline(String(inner.purpose_category ?? "other"))}.
+        </>
+      );
+    case "ContractDeployWithPurposeAndMetadata": {
+      const meta = [inner.asset_name, inner.asset_symbol].filter(Boolean).join(" · ");
+      return (
+        <>
+          You signed a deployment ({formatPurposeHeadline(String(inner.purpose_category ?? "other"))}
+          {meta ? ` · ${meta}` : ""}).
+        </>
+      );
+    }
+    case "Unknown":
+      return null;
+    default: {
+      const _exhaustive: never = kind;
+      return _exhaustive;
+    }
+  }
+}
+
+function TxContextNarrativeRich({
+  kind,
+  sender,
+  payload,
+  network,
+}: {
+  kind: TxPayloadKind;
+  sender: unknown;
+  payload: unknown;
+  network: string;
+}): ReactNode {
+  const from = hexForLink(sender);
+  const p = getTxPayloadInner(payload);
+
+  switch (kind) {
+    case "Unknown":
+      return <>Payload shape not recognized by this explorer.</>;
     case "ContractDeploy":
     case "ContractDeployWithPurpose":
     case "ContractDeployWithPurposeAndMetadata":
-      return true;
+      return (
+        <>
+          Contract deploy ·{" "}
+          {from ? (
+            <Link href={explorerAssetHref(from, network)} className="text-network-cyan hover:underline">
+              {shortenHash(from) || from}
+            </Link>
+          ) : (
+            "—"
+          )}{" "}
+          (QA may apply)
+        </>
+      );
+    case "Transfer": {
+      const faucet = TESTNET_FAUCET_ACCOUNT_HEX.toLowerCase();
+      if (from !== faucet) {
+        return <>{getTxExplorerNarrative(sender, payload)}</>;
+      }
+      const amount = formatBoingAmount(String(p.amount ?? ""));
+      const to = hexForLink(p.to);
+      return (
+        <>
+          Testnet{" "}
+          <Link href={explorerAssetHref(faucet, network)} className="text-network-cyan hover:underline">
+            faucet
+          </Link>
+          {" → "}
+          {to ? (
+            <Link href={explorerAssetHref(to, network)} className="text-network-cyan hover:underline">
+              {shortenHash(to) || to}
+            </Link>
+          ) : (
+            "—"
+          )}
+          {" · "}
+          {amount} BOING
+        </>
+      );
+    }
     default:
-      return false;
+      return <>{getTxExplorerNarrative(sender, payload)}</>;
   }
+}
+
+function LogTopicLine({ topic, network }: { topic: string; network: string }) {
+  const inner = topic.replace(/^0x/i, "");
+  if (inner.length === 64 && /^[0-9a-fA-F]+$/.test(inner)) {
+    const h = normalizeHex64(inner);
+    if (h) {
+      return (
+        <Link href={explorerAssetHref(h, network)} className="text-network-cyan hover:underline break-all">
+          {topic}
+        </Link>
+      );
+    }
+  }
+  return <span className="break-all">{topic}</span>;
 }
 
 function TransferFlowDiagram({
@@ -82,14 +243,16 @@ function TransferFlowDiagram({
             {featured ? "Sender (debited)" : "From"}
           </p>
           <Link
-            href={`/account/${from}?network=${network}`}
+            href={explorerAssetHref(from, network)}
             className={`address-link mt-1 inline-block ${featured ? "text-base font-semibold" : "text-sm"}`}
           >
             {shortenHash(from) || "—"}
           </Link>
           {featured && from ? (
             <p className="mt-2 hash break-all text-left text-[0.65rem] leading-snug text-[var(--text-muted)]">
-              0x{from}
+              <Link href={explorerAssetHref(from, network)} className="text-network-cyan hover:underline">
+                0x{from}
+              </Link>
             </p>
           ) : null}
         </div>
@@ -115,14 +278,16 @@ function TransferFlowDiagram({
             {featured ? "Recipient (credited)" : "To"}
           </p>
           <Link
-            href={`/account/${to}?network=${network}`}
+            href={explorerAssetHref(to, network)}
             className={`address-link mt-1 inline-block ${featured ? "text-base font-semibold" : "text-sm"}`}
           >
             {shortenHash(to) || "—"}
           </Link>
           {featured && to ? (
             <p className="mt-2 hash break-all text-right text-[0.65rem] leading-snug text-[var(--text-muted)] sm:text-right">
-              0x{to}
+              <Link href={explorerAssetHref(to, network)} className="text-network-cyan hover:underline">
+                0x{to}
+              </Link>
             </p>
           ) : null}
         </div>
@@ -162,12 +327,14 @@ function StakeMovementVisual({
       </div>
       <div className="mt-6 rounded-lg border border-[var(--border-color)] bg-boing-black/35 p-4 text-center">
         <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-muted)]">Signer account</p>
-        <Link href={`/account/${from}?network=${network}`} className="address-link mt-2 inline-block text-base font-semibold">
+        <Link href={explorerAssetHref(from, network)} className="address-link mt-2 inline-block text-base font-semibold">
           {shortenHash(from) || "—"}
         </Link>
         {from ? (
           <p className="mt-2 hash break-all text-center text-[0.65rem] leading-snug text-[var(--text-muted)]">
-            0x{from}
+            <Link href={explorerAssetHref(from, network)} className="text-network-cyan hover:underline">
+              0x{from}
+            </Link>
           </p>
         ) : null}
       </div>
@@ -190,13 +357,17 @@ function ContractCallFeaturedVisual({ payload, network }: { payload: unknown; ne
       <div className="mt-6 rounded-lg border border-[var(--border-color)] bg-boing-black/35 p-4 text-center">
         <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-muted)]">Contract account</p>
         <Link
-          href={`/account/${contract}?network=${network}`}
+          href={explorerAssetHref(contract, network)}
           className="mt-2 inline-block font-display text-lg font-semibold text-amber-100 hover:text-amber-50"
         >
           {shortenHash(contract) || "—"}
         </Link>
         {contract ? (
-          <p className="mt-2 hash break-all text-center text-[0.65rem] text-[var(--text-muted)]">0x{contract}</p>
+          <p className="mt-2 hash break-all text-center text-[0.65rem] text-[var(--text-muted)]">
+            <Link href={explorerAssetHref(contract, network)} className="text-network-cyan hover:underline">
+              0x{contract}
+            </Link>
+          </p>
         ) : null}
         <p className="mt-4 text-sm text-[var(--text-secondary)]">
           Calldata: <span className="font-mono text-network-cyan">{cd.bytes}</span> bytes
@@ -206,7 +377,7 @@ function ContractCallFeaturedVisual({ payload, network }: { payload: unknown; ne
   );
 }
 
-function AccessListPanel({ tx }: { tx: BlockTransaction }) {
+function AccessListPanel({ tx, network }: { tx: BlockTransaction; network: string }) {
   const al = tx.access_list;
   if (!al) return null;
   const reads = al.read?.length ?? 0;
@@ -223,9 +394,20 @@ function AccessListPanel({ tx }: { tx: BlockTransaction }) {
           <div>
             <p className="mb-1 font-medium text-[var(--text-muted)]">Read accounts</p>
             <ul className="hash max-h-32 space-y-1 overflow-y-auto text-[var(--text-secondary)]">
-              {al.read!.map((h) => (
-                <li key={h}>{h}</li>
-              ))}
+              {al.read!.map((h) => {
+                const link = hexForLink(h);
+                return (
+                  <li key={h}>
+                    {link ? (
+                      <Link href={explorerAssetHref(link, network)} className="text-network-cyan hover:underline">
+                        {h}
+                      </Link>
+                    ) : (
+                      h
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ) : null}
@@ -233,9 +415,20 @@ function AccessListPanel({ tx }: { tx: BlockTransaction }) {
           <div>
             <p className="mb-1 font-medium text-[var(--text-muted)]">Write accounts</p>
             <ul className="hash max-h-32 space-y-1 overflow-y-auto text-[var(--text-secondary)]">
-              {al.write!.map((h) => (
-                <li key={h}>{h}</li>
-              ))}
+              {al.write!.map((h) => {
+                const link = hexForLink(h);
+                return (
+                  <li key={h}>
+                    {link ? (
+                      <Link href={explorerAssetHref(link, network)} className="text-network-cyan hover:underline">
+                        {h}
+                      </Link>
+                    ) : (
+                      h
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ) : null}
@@ -340,7 +533,7 @@ function ReceiptPanel({
                   <ul className="mt-1 space-y-0.5 hash break-all text-[var(--text-secondary)]">
                     {log.topics.map((t, j) => (
                       <li key={j}>
-                        t{j} {t}
+                        t{j} <LogTopicLine topic={t} network={network} />
                       </li>
                     ))}
                   </ul>
@@ -376,16 +569,18 @@ export function TransactionInsight({
 }) {
   const kind = getTxPayloadKind(tx.payload);
   const summary = getTxPayloadSummary(tx.payload);
-  const narrative = getTxExplorerNarrative(tx.sender, tx.payload);
   const sender = hexForLink(tx.sender);
   const payloadInner = getTxPayloadInner(tx.payload);
-  const signedHeadline = getSignedPayloadHeadline(kind, payloadInner);
   const detailLines = buildPayloadDetailLines(tx.payload);
+  const deployedAssetHex =
+    isContractDeployPayloadKind(kind) && receipt && receipt.success !== false
+      ? tryParseCreatedAccountIdFromDeployReturnData(receipt.return_data)
+      : null;
   const featured = visualScale === "featured";
 
   const isFaucetTransfer =
     kind === "Transfer" && sender === TESTNET_FAUCET_ACCOUNT_HEX.toLowerCase();
-  const showContextNote = kind === "Unknown" || isDeployPayloadKind(kind) || isFaucetTransfer;
+  const showContextNote = kind === "Unknown" || isContractDeployPayloadKind(kind) || isFaucetTransfer;
 
   return (
     <article
@@ -414,7 +609,7 @@ export function TransactionInsight({
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-muted)]">Signer</p>
             <div className="mt-1 flex flex-wrap items-center gap-2">
-              <Link href={`/account/${sender}?network=${network}`} className="address-link text-sm">
+              <Link href={explorerAssetHref(sender, network)} className="address-link text-sm">
                 {shortenHash(sender) || "—"}
               </Link>
               <CopyButton value={toPrefixedHex64(sender)} label="Copy signer" />
@@ -428,6 +623,25 @@ export function TransactionInsight({
         </div>
         <p className="max-w-md text-right text-sm font-medium text-[var(--text-secondary)]">{summary}</p>
       </header>
+
+      {deployedAssetHex ? (
+        <div className="rounded-xl border border-fuchsia-500/40 bg-gradient-to-br from-fuchsia-950/35 via-boing-navy-mid/40 to-boing-black/30 p-4 sm:p-5">
+          <h4 className="font-display text-xs font-semibold uppercase tracking-[0.15em] text-fuchsia-200/90">
+            Deployed asset
+          </h4>
+          <p className="mt-2 text-sm text-[var(--text-secondary)]">
+            New on-chain account created by this deployment (token, NFT, or contract). Open the asset page for balances,
+            nonce, and contract hints.
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Link href={explorerAssetHref(deployedAssetHex, network)} className="address-link text-sm font-semibold">
+              {shortenHash(deployedAssetHex)}
+            </Link>
+            <CopyButton value={toPrefixedHex64(deployedAssetHex)} label="Copy asset address" />
+          </div>
+          <p className="mt-2 hash break-all text-[0.65rem] text-[var(--text-muted)]">0x{deployedAssetHex}</p>
+        </div>
+      ) : null}
 
       {kind === "Transfer" ? (
         <TransferFlowDiagram
@@ -448,16 +662,18 @@ export function TransactionInsight({
       ) : null}
 
       {showContextNote ? (
-        <p className="text-sm leading-snug text-[var(--text-secondary)]">{narrative}</p>
+        <p className="text-sm leading-snug text-[var(--text-secondary)]">
+          <TxContextNarrativeRich kind={kind} sender={tx.sender} payload={tx.payload} network={network} />
+        </p>
       ) : null}
 
-      {kind !== "Unknown" && signedHeadline ? (
+      {kind !== "Unknown" ? (
         <div className="rounded-xl border border-network-primary/35 bg-gradient-to-br from-network-primary/[0.12] via-boing-navy-mid/50 to-boing-black/40 p-4 sm:p-5">
           <h4 className="font-display text-xs font-semibold uppercase tracking-[0.15em] text-network-primary-light/90">
             What you signed
           </h4>
           <p className="mt-3 text-sm leading-relaxed text-[var(--text-primary)] sm:text-[0.95rem]">
-            {signedHeadline}
+            <SignedPayloadHeadlineRich kind={kind} inner={payloadInner} network={network} />
           </p>
           {detailLines.length > 0 ? (
             <>
@@ -474,7 +690,7 @@ export function TransactionInsight({
                       <div className="flex flex-wrap items-center gap-2">
                         {row.accountHex64 ? (
                           <Link
-                            href={`/account/${row.accountHex64}?network=${network}`}
+                            href={explorerAssetHref(row.accountHex64, network)}
                             className="hash text-sm text-network-cyan hover:underline"
                           >
                             {row.value}
@@ -502,7 +718,7 @@ export function TransactionInsight({
         </div>
       )}
 
-      <AccessListPanel tx={tx} />
+      <AccessListPanel tx={tx} network={network} />
 
       {receiptsWereRequested ? (
         receipt ? (

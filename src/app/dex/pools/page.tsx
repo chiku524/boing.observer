@@ -49,6 +49,10 @@ export default function DexPoolsPage() {
           <code className="rounded bg-white/10 px-1 text-sm">fetchNativeDexDirectorySnapshot</code> on the server.
         </p>
         <p className="text-sm">
+          <Link href="/tokens" className="text-network-cyan hover:underline">
+            Token &amp; asset index
+          </Link>
+          {" · "}
           <Link href="/dex/quote" className="text-network-cyan hover:underline">
             CP route quotes →
           </Link>

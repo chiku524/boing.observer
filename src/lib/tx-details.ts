@@ -9,7 +9,7 @@ import { formatBoingAmount, getTxPayloadKind, getTxPayloadInner } from "./tx-pay
 export type TxDetailLine = {
   label: string;
   value: string;
-  /** Link target for explorer `/account/[hex]` (64 hex, no 0x). */
+  /** Link target for explorer `/asset/[hex]` (64 hex, no 0x). */
   accountHex64?: string;
   /** Full string for copy-to-clipboard (e.g. full calldata hex). */
   copyValue?: string;

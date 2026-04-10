@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useNetwork } from "@/context/network-context";
 import { fetchBlockByHash, fetchTransactionReceipt } from "@/lib/rpc-methods";
+import { explorerAssetHref } from "@/lib/explorer-href";
 import { isHex64, normalizeHex64, type NetworkId } from "@/lib/rpc-types";
 
 const HEIGHT = /^\d+$/;
@@ -41,16 +42,16 @@ export function SearchBar({ layout = "inline", className = "" }: SearchBarProps)
         }
         const block = await fetchBlockByHash(network as NetworkId, hex);
         if (block) router.push(`/block/hash/${hex}?network=${network}`);
-        else router.push(`/account/${hex}?network=${network}`);
+        else router.push(explorerAssetHref(hex, network));
       } catch {
-        router.push(`/account/${hex}?network=${network}`);
+        router.push(explorerAssetHref(hex, network));
       } finally {
         setLoading(false);
       }
       return;
     }
     setError(
-      "Enter a block height (number), or 64 hex (transaction id, block hash, or account — we try tx first)."
+      "Enter a block height (number), or 64 hex (transaction id, block hash, or asset / account address — we try tx first)."
     );
   }, [value, network, router]);
 
@@ -64,11 +65,11 @@ export function SearchBar({ layout = "inline", className = "" }: SearchBarProps)
           onKeyDown={(e) => e.key === "Enter" && search()}
           placeholder={
             stacked
-              ? "Height or 64-char hex (tx / block / account)"
-              : "Block height, or 64 hex (tx id, block hash, address)"
+              ? "Height or 64-char hex (tx / block / asset address)"
+              : "Block height, or 64 hex (tx id, block hash, asset)"
           }
           className="hash min-h-11 w-full flex-1 rounded-lg border border-[var(--border-color)] bg-boing-navy-mid/80 px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-network-primary focus:outline-none focus:ring-1 focus:ring-network-primary sm:px-4"
-          aria-label="Search by block height, transaction id, block hash, or account address"
+          aria-label="Search by block height, transaction id, block hash, or asset address"
           data-testid="explorer-search-input"
         />
         <button

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { explorerAssetHref } from "@/lib/explorer-href";
 import { useNetwork } from "@/context/network-context";
 import { SearchBar } from "@/components/search-bar";
 import { SiteLogo } from "@/components/site-logo";
@@ -154,7 +155,7 @@ export default function HomePage() {
                       Proposer{" "}
                       {proposerStr ? (
                         <Link
-                          href={`/account/${proposerStr}?network=${network}`}
+                          href={explorerAssetHref(proposerStr, network)}
                           className="hash text-network-cyan hover:underline"
                         >
                           {shortenHash(proposerStr)}
@@ -206,7 +207,7 @@ export default function HomePage() {
                         </td>
                         <td className="py-3 pr-4">
                           <Link
-                            href={`/account/${proposerStr}?network=${network}`}
+                            href={explorerAssetHref(proposerStr, network)}
                             className="hash text-network-cyan hover:underline"
                           >
                             {shortenHash(proposerStr)}

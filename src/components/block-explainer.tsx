@@ -26,8 +26,8 @@ export function BlockExplainerBanner({ variant = "by-hash" }: Props) {
         ) : null}
         <li>
           State changes are listed under <strong>Transactions</strong>. For a signable payload id, open the{" "}
-          <strong>Transaction page</strong> link on a receipt or search 64-character hex (tx is tried
-          before block hash).
+          <strong>Transaction page</strong> link on a receipt or search 64-character hex (tx is tried before block
+          hash, then <strong>asset</strong> address).
         </li>
         <li>
           Amounts are whole <strong>BOING</strong> (node RPC units).

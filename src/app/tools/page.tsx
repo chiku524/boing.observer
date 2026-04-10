@@ -5,7 +5,7 @@ import { SITE_URL, NETWORK_FAUCET_URL } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Developer tools",
   description:
-    "Boing Observer developer utilities: faucet, QA pre-flight, RPC catalog, native DEX directory, node health, and more.",
+    "Boing Observer developer utilities: token index, faucet, QA pre-flight, RPC catalog, native DEX directory, node health, and more.",
   alternates: { canonical: `${SITE_URL}/tools` },
 };
 
@@ -93,6 +93,19 @@ export default function ToolsPage() {
             <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
               Run <code className="rounded bg-white/10 px-1 text-xs">boing_qaCheck</code> on bytecode before
               deployment.
+            </p>
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/tokens"
+            className="glass-card block h-full p-5 transition-colors hover:border-[var(--border-hover)]"
+          >
+            <h2 className="font-display text-lg font-semibold text-network-cyan">Token &amp; asset index</h2>
+            <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
+              Scan recent blocks for deploys and merge native DEX{" "}
+              <code className="rounded bg-white/10 px-1 text-xs">register_pair</code> tokens. Snapshots persist on disk
+              (TTL) between requests; Rescan bypasses cache.
             </p>
           </Link>
         </li>

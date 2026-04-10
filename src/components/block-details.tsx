@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { explorerAssetHref } from "@/lib/explorer-href";
 import type { Block } from "@/lib/rpc-types";
 import { shortenHash, hexForLink, toPrefixedHex64 } from "@/lib/rpc-types";
 import { CopyButton } from "@/components/copy-button";
@@ -72,7 +73,7 @@ export function BlockDetails({
                 {proposerHex ? (
                   <>
                     <Link
-                      href={`/account/${proposerHex}?network=${network}`}
+                      href={explorerAssetHref(proposerHex, network)}
                       className="address-link font-mono text-sm"
                       title="Validator account that proposed this block (HotStuff BFT)"
                     >
@@ -85,7 +86,7 @@ export function BlockDetails({
                 )}
               </div>
               <p className="text-xs leading-relaxed text-[var(--text-muted)]">
-                Consensus validators rotate proposal duties; open the account page for balance and contract hints.
+                Consensus validators rotate proposal duties; open the asset page for balance and contract hints.
               </p>
               {consensusHint &&
                 (consensusHint.validatorCount != null || consensusHint.model) && (

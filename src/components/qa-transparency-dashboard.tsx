@@ -15,7 +15,8 @@ import {
 import { fetchQaPoolConfig, fetchQaPoolList, fetchQaRegistry } from "@/lib/rpc-methods";
 import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
 import type { QaPoolConfigResult, QaPoolItemSummary, QaRegistryResult } from "@/lib/rpc-types";
-import { hexForLink, shortenHash } from "@/lib/rpc-types";
+import { explorerAssetHref } from "@/lib/explorer-href";
+import { hexForLink, normalizeHex64, shortenHash } from "@/lib/rpc-types";
 
 function formatDuration(secs: number): string {
   if (secs < 60) return `${secs}s`;
@@ -389,11 +390,23 @@ export function QaTransparencyDashboard() {
               <tbody>
                 {items.map((row) => {
                   const deployerPath = hexForLink(row.deployer);
+                  const txPath = normalizeHex64(row.tx_hash.replace(/^0x/i, ""));
                   return (
                     <tr key={row.tx_hash} className="border-b border-[var(--border-color)]/60 hover:bg-white/5">
                       <td className="p-3 align-top">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="hash text-xs text-[var(--text-secondary)] break-all">{shortenHash(row.tx_hash, 12, 10)}</span>
+                          {txPath ? (
+                            <Link
+                              href={`/tx/${txPath}?network=${network}`}
+                              className="hash text-xs text-network-cyan hover:underline break-all"
+                            >
+                              {shortenHash(row.tx_hash, 12, 10)}
+                            </Link>
+                          ) : (
+                            <span className="hash text-xs text-[var(--text-secondary)] break-all">
+                              {shortenHash(row.tx_hash, 12, 10)}
+                            </span>
+                          )}
                           <CopyButton value={row.tx_hash} label="Copy tx hash" />
                         </div>
                       </td>
@@ -402,7 +415,7 @@ export function QaTransparencyDashboard() {
                       </td>
                       <td className="p-3 align-top">
                         <Link
-                          href={`/account/${deployerPath}?network=${network}`}
+                          href={explorerAssetHref(deployerPath, network)}
                           className="address-link text-xs"
                         >
                           {shortenHash(deployerPath)}

@@ -52,6 +52,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     },
     {
+      url: `${SITE_URL}/tokens`,
+      lastModified: new Date(),
+      changeFrequency: "hourly",
+      priority: 0.82,
+    },
+    {
       url: `${SITE_URL}/dex/pools`,
       lastModified: new Date(),
       changeFrequency: "daily",

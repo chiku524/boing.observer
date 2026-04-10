@@ -3,6 +3,9 @@ node_modules
 .pnp
 .pnp.js
 
+# Token index disk cache (local / writable servers)
+.cache
+
 # Build / OpenNext (Cloudflare)
 .next
 .open-next

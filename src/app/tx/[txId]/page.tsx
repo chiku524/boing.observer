@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useNetwork } from "@/context/network-context";
 import { fetchBlockByHeight, fetchTransactionReceipt } from "@/lib/rpc-methods";
 import type { Block, BlockTransaction, TransactionReceipt } from "@/lib/rpc-types";
+import { explorerAssetHref } from "@/lib/explorer-href";
 import { isHex64, normalizeHex64, toPrefixedHex64 } from "@/lib/rpc-types";
 import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
 import { CopyButton } from "@/components/copy-button";
@@ -143,8 +144,8 @@ export default function TransactionByIdPage() {
             block
           </Link>
           {" or "}
-          <Link href={`/account/${txId}?network=${network}`} className="text-network-cyan hover:underline">
-            account
+          <Link href={explorerAssetHref(txId, network)} className="text-network-cyan hover:underline">
+            asset
           </Link>
           .
         </p>

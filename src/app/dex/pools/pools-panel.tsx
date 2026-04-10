@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useNetwork } from "@/context/network-context";
+import { explorerAssetHref } from "@/lib/explorer-href";
 import { shortenHash, normalizeHex64 } from "@/lib/rpc-types";
 import { THREE_CODEBASE_ALIGNMENT_URL } from "@/lib/constants";
 
@@ -22,9 +23,9 @@ type SnapshotResponse = {
   registerLogs: { tokenAHex: string; tokenBHex: string; poolHex: string }[] | null;
 };
 
-function accountPath(hexWith0x: string): string {
+function assetPath(hexWith0x: string, network: string): string {
   const h = normalizeHex64(hexWith0x.replace(/^0x/i, ""));
-  return h ? `/account/${h}` : "#";
+  return h ? explorerAssetHref(h, network) : "#";
 }
 
 export function PoolsPanel() {
@@ -142,7 +143,7 @@ export function PoolsPanel() {
                 <span className="text-[var(--text-muted)]">Native CP pool</span>
                 {data.defaults.nativeCpPoolAccountHex ? (
                   <Link
-                    href={accountPath(data.defaults.nativeCpPoolAccountHex)}
+                    href={assetPath(data.defaults.nativeCpPoolAccountHex, network)}
                     className="mt-1 block font-mono text-network-cyan hover:underline break-all"
                   >
                     {shortenHash(data.defaults.nativeCpPoolAccountHex, 12, 10)}
@@ -156,7 +157,7 @@ export function PoolsPanel() {
                 <span className="text-[var(--text-muted)]">DEX factory (pair directory)</span>
                 {data.defaults.nativeDexFactoryAccountHex ? (
                   <Link
-                    href={accountPath(data.defaults.nativeDexFactoryAccountHex)}
+                    href={assetPath(data.defaults.nativeDexFactoryAccountHex, network)}
                     className="mt-1 block font-mono text-network-cyan hover:underline break-all"
                   >
                     {shortenHash(data.defaults.nativeDexFactoryAccountHex, 12, 10)}
@@ -187,17 +188,17 @@ export function PoolsPanel() {
                     {data.registerLogs.map((row, i) => (
                       <tr key={`${row.poolHex}-${i}`} className="border-b border-[var(--border-color)]/60">
                         <td className="py-2 pr-3 font-mono text-xs">
-                          <Link href={accountPath(row.poolHex)} className="text-network-cyan hover:underline">
+                          <Link href={assetPath(row.poolHex, network)} className="text-network-cyan hover:underline">
                             {shortenHash(row.poolHex, 10, 8)}
                           </Link>
                         </td>
                         <td className="py-2 pr-3 font-mono text-xs">
-                          <Link href={accountPath(row.tokenAHex)} className="text-network-cyan hover:underline">
+                          <Link href={assetPath(row.tokenAHex, network)} className="text-network-cyan hover:underline">
                             {shortenHash(row.tokenAHex, 10, 8)}
                           </Link>
                         </td>
                         <td className="py-2 font-mono text-xs">
-                          <Link href={accountPath(row.tokenBHex)} className="text-network-cyan hover:underline">
+                          <Link href={assetPath(row.tokenBHex, network)} className="text-network-cyan hover:underline">
                             {shortenHash(row.tokenBHex, 10, 8)}
                           </Link>
                         </td>

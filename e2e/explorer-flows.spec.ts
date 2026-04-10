@@ -21,11 +21,14 @@ test.describe("Explorer account & transaction flows", () => {
     await expect(page.getByText(/No receipt for this id/i)).toBeVisible();
   });
 
-  test("invalid account address shows validation error", async ({ page }) => {
+  test("invalid address shows validation error on account route", async ({ page }) => {
     await page.goto("/account/0xdeadbeef");
-    await expect(
-      page.locator('[role="alert"]').filter({ hasText: /Invalid account address/i }),
-    ).toBeVisible();
+    await expect(page.locator('[role="alert"]').filter({ hasText: /Invalid address/i })).toBeVisible();
+  });
+
+  test("invalid address shows validation error on asset route", async ({ page }) => {
+    await page.goto("/asset/0xdeadbeef");
+    await expect(page.locator('[role="alert"]').filter({ hasText: /Invalid address/i })).toBeVisible();
   });
 
   test("testnet faucet account page loads contract hints section", async ({ page }) => {
@@ -35,5 +38,13 @@ test.describe("Explorer account & transaction flows", () => {
     await expect(page.locator("[aria-busy=true]")).toHaveCount(0, { timeout: 20_000 });
     await expect(page.getByRole("heading", { name: /Contract & network hints/i })).toBeVisible();
     await expect(page.getByText(/Indexer & bytecode scope/i)).toBeVisible();
+  });
+
+  test("asset page loads same on-chain view for a valid address", async ({ page }) => {
+    await installMinimalRpcMocks(page);
+    await page.goto(`/asset/${TESTNET_FAUCET_ACCOUNT_HEX}`);
+    await expect(page.getByRole("heading", { name: /^Asset$/i })).toBeVisible();
+    await expect(page.locator("[aria-busy=true]")).toHaveCount(0, { timeout: 20_000 });
+    await expect(page.getByRole("heading", { name: /Contract & network hints/i })).toBeVisible();
   });
 });

@@ -91,6 +91,17 @@ export function getTxPayloadKind(payload: unknown): TxPayloadKind {
   return getTxPayloadKindFlat(inner);
 }
 
+export function isContractDeployPayloadKind(kind: TxPayloadKind): boolean {
+  switch (kind) {
+    case "ContractDeploy":
+    case "ContractDeployWithPurpose":
+    case "ContractDeployWithPurposeAndMetadata":
+      return true;
+    default:
+      return false;
+  }
+}
+
 export function getTxPayloadSummary(payload: unknown): string {
   const kind = getTxPayloadKind(payload);
   if (kind === "Unknown") return "—";

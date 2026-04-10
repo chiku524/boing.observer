@@ -127,7 +127,7 @@ export function NetworkChainContext() {
           <p className="text-xs leading-relaxed text-[var(--text-muted)]">
             Per-account <strong className="text-[var(--text-secondary)]">balance</strong> and{" "}
             <strong className="text-[var(--text-secondary)]">stake</strong> are available via{" "}
-            <code className="rounded bg-white/10 px-1 py-0.5">boing_getAccount</code> on the account page.
+            <code className="rounded bg-white/10 px-1 py-0.5">boing_getAccount</code> on the asset or account page.
           </p>
         </div>
       </div>
