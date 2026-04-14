@@ -1,8 +1,12 @@
 import "server-only";
 
 import type { BoingClient } from "boing-sdk";
-import { fetchBlocksWithReceiptsForHeightRange, fetchNativeDexDirectorySnapshot } from "boing-sdk";
-import { tryParseCreatedAccountIdFromDeployReturnData } from "@/lib/deploy-receipt";
+import {
+  buildNativeDexIntegrationOverridesFromProcessEnv,
+  fetchBlocksWithReceiptsForHeightRange,
+  fetchNativeDexDirectorySnapshot,
+} from "boing-sdk";
+import { receiptReturnDataHex, tryParseCreatedAccountIdFromDeployReturnData } from "@/lib/deploy-receipt";
 import { hexForLink, normalizeHex64 } from "@/lib/rpc-types";
 import {
   getTxPayloadInner,
@@ -112,6 +116,9 @@ export async function buildTokenIndexForHeightRange(
 
   const maxConcurrent = Math.min(12, Math.max(1, options?.maxConcurrent ?? 6));
 
+  const dexOverridesRaw = buildNativeDexIntegrationOverridesFromProcessEnv();
+  const dexOverrides = Object.keys(dexOverridesRaw).length ? dexOverridesRaw : undefined;
+
   const [bundles, dexSnap] = await Promise.all([
     fetchBlocksWithReceiptsForHeightRange(client, fromHeight, toHeight, {
       maxConcurrent,
@@ -119,8 +126,22 @@ export async function buildTokenIndexForHeightRange(
     }),
     fetchNativeDexDirectorySnapshot(client, {
       registerLogs: { fromBlock: fromHeight, toBlock: toHeight },
+      overrides: dexOverrides,
     }),
   ]);
+
+  const indexWarnings: string[] = [];
+  if (dexSnap.defaults.nativeDexFactoryAccountHex == null) {
+    indexWarnings.push(
+      "No native DEX factory address could be resolved (RPC chain_id / end_user hints missing and no BOING_NATIVE_VM_DEX_FACTORY-style env override). register_pair tokens were not merged — only deploy receipts count.",
+    );
+  } else if (dexSnap.registerLogs == null) {
+    indexWarnings.push("register_pair log fetch was skipped despite a factory hint — check RPC getLogs limits.");
+  } else if (dexSnap.registerLogs.length === 0) {
+    indexWarnings.push(
+      "No register_pair events in this block window. Increase scan depth or Rescan after the pool was registered on-chain.",
+    );
+  }
 
   const map = new Map<string, MutableEntry>();
 
@@ -137,7 +158,7 @@ export async function buildTokenIndexForHeightRange(
       if (!isContractDeployPayloadKind(kind)) continue;
       const receipt = receipts[i];
       if (receipt == null || receipt.success === false) continue;
-      const addr = tryParseCreatedAccountIdFromDeployReturnData(receipt.return_data);
+      const addr = tryParseCreatedAccountIdFromDeployReturnData(receiptReturnDataHex(receipt));
       if (!addr) continue;
       const inner = getTxPayloadInner(tx.payload);
       const purpose =
@@ -192,5 +213,6 @@ export async function buildTokenIndexForHeightRange(
     blockBundlesFetched: bundles.length,
     dexRegisterRows: dexRows.length,
     entries,
+    indexWarnings,
   };
 }

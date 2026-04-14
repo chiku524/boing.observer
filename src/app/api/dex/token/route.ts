@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BoingRpcError, validateHex32 } from "boing-sdk";
 import { createServerBoingClient } from "@/lib/server-boing-client";
-import { canonicalNativeDexFactoryHex } from "@/lib/server-dex-factory";
+import { resolveNativeDexFactoryForExplorer } from "@/lib/resolve-native-dex-factory";
 import { isMainnetConfigured } from "@/lib/rpc-client";
 import type { NetworkId } from "@/lib/rpc-types";
 
@@ -36,8 +36,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const client = createServerBoingClient(network);
-    const info = await client.getNetworkInfo();
-    const factory = canonicalNativeDexFactoryHex(info);
+    const factory = await resolveNativeDexFactoryForExplorer(client);
     if (!factory) {
       return NextResponse.json({
         supported: false as const,

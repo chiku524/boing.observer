@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BoingRpcError, validateHex32 } from "boing-sdk";
 import { createServerBoingClient } from "@/lib/server-boing-client";
-import { canonicalNativeDexFactoryHex, dexDiagnosticsEnabled } from "@/lib/server-dex-factory";
+import { dexDiagnosticsEnabled } from "@/lib/server-dex-factory";
+import { resolveNativeDexFactoryForExplorer } from "@/lib/resolve-native-dex-factory";
 import { isMainnetConfigured } from "@/lib/rpc-client";
 import type { NetworkId } from "@/lib/rpc-types";
 
@@ -42,14 +43,13 @@ export async function GET(req: NextRequest) {
 
   try {
     const client = createServerBoingClient(network);
-    const info = await client.getNetworkInfo();
-    const factory = factoryOverride ?? canonicalNativeDexFactoryHex(info);
+    const factory = factoryOverride ?? (await resolveNativeDexFactoryForExplorer(client));
     if (!factory) {
       return NextResponse.json({
         supported: false as const,
         reason: "no_canonical_factory",
         message:
-          "This RPC did not publish end_user.canonical_native_dex_factory. Set BOING_CANONICAL_NATIVE_DEX_FACTORY on the node or pass ?factory=0x…",
+          "No factory address resolved for DEX discovery. Set BOING_CANONICAL_NATIVE_DEX_FACTORY on the node, pass ?factory=0x…, or set BOING_NATIVE_VM_DEX_FACTORY / BOING_DEX_FACTORY_HEX on this host (see boing-sdk mergeNativeDexIntegrationDefaults).",
       });
     }
 

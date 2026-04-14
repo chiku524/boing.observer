@@ -3,9 +3,28 @@
 import Link from "next/link";
 import { NETWORK_FAUCET_URL, WALLET_URL } from "@/lib/constants";
 import { MobileMenu } from "@/components/mobile-menu";
+import { NavMenuDropdown } from "@/components/nav-menu-dropdown";
 import { SiteLogo } from "@/components/site-logo";
 import { NetworkSelector } from "./network-selector";
 import { SearchBar } from "./search-bar";
+
+const EXPLORE_LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/qa", label: "QA transparency" },
+] as const;
+
+const INDEX_LINKS = [
+  { href: "/tokens", label: "Token index (block scan)" },
+  { href: "/dex/tokens", label: "DEX tokens (RPC)" },
+  { href: "/dex/pools", label: "DEX pools & directory" },
+  { href: "/dex/quote", label: "DEX quotes" },
+] as const;
+
+const ECOSYSTEM_LINKS = [
+  { href: WALLET_URL, label: "Wallet (boing.express)", external: true },
+  { href: NETWORK_FAUCET_URL, label: "Faucet", external: true },
+] as const;
 
 export function Header() {
   return (
@@ -17,53 +36,22 @@ export function Header() {
         <SiteLogo className="shrink-0" />
 
         <nav
-          className="hidden shrink-0 items-center gap-x-2 lg:flex xl:gap-x-4"
+          className="hidden shrink-0 items-center gap-x-1 lg:flex xl:gap-x-2"
           aria-label="Main navigation"
         >
-          <Link href="/" className="nav-link whitespace-nowrap px-1 py-2 text-sm">
-            Home
-          </Link>
-          <Link href="/about" className="nav-link whitespace-nowrap px-1 py-2 text-sm">
-            About
-          </Link>
-          <Link href="/qa" className="nav-link whitespace-nowrap px-1 py-2 text-sm">
-            QA
-          </Link>
+          <NavMenuDropdown label="Explore" items={EXPLORE_LINKS} />
+          <NavMenuDropdown label="Tokens & DEX" items={INDEX_LINKS} />
           <Link href="/tools" className="nav-link whitespace-nowrap px-1 py-2 text-sm">
             Tools
           </Link>
-          <Link href="/tokens" className="nav-link whitespace-nowrap px-1 py-2 text-sm">
-            Tokens
-          </Link>
-          <Link href="/dex/tokens" className="nav-link whitespace-nowrap px-1 py-2 text-sm">
-            DEX tokens
-          </Link>
-          <Link href="/dex/pools" className="nav-link whitespace-nowrap px-1 py-2 text-sm">
-            DEX
-          </Link>
-          <a
-            href={WALLET_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="nav-link whitespace-nowrap px-1 py-2 text-sm"
-          >
-            Wallet
-          </a>
-          <a
-            href={NETWORK_FAUCET_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="nav-link whitespace-nowrap px-1 py-2 text-sm"
-          >
-            Faucet
-          </a>
+          <NavMenuDropdown label="Ecosystem" items={ECOSYSTEM_LINKS} />
         </nav>
 
         <div
-          className="order-last hidden min-w-0 flex-1 justify-center px-2 lg:order-none lg:flex lg:max-w-md lg:flex-1"
+          className="order-last hidden min-w-0 flex-1 justify-center px-2 lg:order-none lg:flex lg:min-w-[12rem] lg:max-w-2xl lg:flex-1"
           role="search"
         >
-          <SearchBar className="w-full" />
+          <SearchBar className="max-w-none" />
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">

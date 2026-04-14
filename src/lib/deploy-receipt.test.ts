@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { tryParseCreatedAccountIdFromDeployReturnData } from "./deploy-receipt";
+import { receiptReturnDataHex, tryParseCreatedAccountIdFromDeployReturnData } from "./deploy-receipt";
+
+describe("receiptReturnDataHex", () => {
+  it("reads return_data or returnData", () => {
+    const id = "a".repeat(64);
+    expect(receiptReturnDataHex({ return_data: `0x${id}` })).toBe(`0x${id}`);
+    expect(receiptReturnDataHex({ returnData: `0x${id}` })).toBe(`0x${id}`);
+    expect(receiptReturnDataHex(null)).toBeUndefined();
+  });
+});
 
 describe("tryParseCreatedAccountIdFromDeployReturnData", () => {
   it("parses a 32-byte return buffer", () => {

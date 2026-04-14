@@ -221,7 +221,11 @@ export function DexTokensPanel() {
               {nextCursor ? "+" : ""})
             </h2>
             {rows.length === 0 ? (
-              <p className="text-sm text-[var(--text-muted)]">No tokens in this page.</p>
+              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+                No tokens in this page. Tokens appear only after they are part of at least one pool under the factory and
+                the node supports <code className="rounded bg-white/10 px-1 text-xs">boing_listDexTokens</code>. Try{" "}
+                <strong className="text-[var(--text-primary)]">Load more</strong> if the cursor paginator has more pages.
+              </p>
             ) : (
               <table className="w-full min-w-[52rem] text-left text-sm">
                 <thead>

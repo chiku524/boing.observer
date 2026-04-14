@@ -214,7 +214,11 @@ export function DexRpcPoolsSection() {
               {nextCursor ? "+" : ""})
             </h3>
             {rows.length === 0 ? (
-              <p className="text-sm text-[var(--text-muted)]">No pools on this page.</p>
+              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+                No pools on this page. If you expected rows here, confirm this RPC implements{" "}
+                <code className="rounded bg-white/10 px-1 text-xs">boing_listDexPools</code> (not Method not found) and
+                that pools are registered on the resolved factory.
+              </p>
             ) : (
               <table className="w-full min-w-[56rem] text-left text-sm">
                 <thead>

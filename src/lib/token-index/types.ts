@@ -20,6 +20,8 @@ export type TokenIndexResult = {
   blockBundlesFetched: number;
   dexRegisterRows: number;
   entries: TokenIndexJsonEntry[];
+  /** Non-fatal hints (e.g. factory not resolved, so register_pair merge was skipped). */
+  indexWarnings?: string[];
 };
 
 /** How this response was produced (disk cache vs live RPC scan). */

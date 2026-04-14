@@ -11,7 +11,7 @@ const WINDOW_OPTIONS = [256, 512, 1024, 2048] as const;
 
 export function TokensIndexPanel() {
   const { network } = useNetwork();
-  const [windowBlocks, setWindowBlocks] = useState<number>(512);
+  const [windowBlocks, setWindowBlocks] = useState<number>(1024);
   const [data, setData] = useState<(TokenIndexResult & { note?: string; cacheMeta?: TokenIndexCacheMeta }) | null>(
     null,
   );
@@ -114,6 +114,20 @@ export function TokensIndexPanel() {
         <p className="rounded-lg border border-red-500/40 bg-red-950/25 px-4 py-3 text-sm text-red-200" role="alert">
           {error}
         </p>
+      )}
+
+      {data && !error && data.indexWarnings && data.indexWarnings.length > 0 && (
+        <div
+          className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
+          role="status"
+        >
+          <p className="font-medium text-amber-200">Index notes</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-[var(--text-secondary)] leading-relaxed">
+            {data.indexWarnings.map((w, i) => (
+              <li key={i}>{w}</li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {data && !error && data.cacheMeta && (

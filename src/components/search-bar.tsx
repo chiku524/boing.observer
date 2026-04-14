@@ -12,10 +12,11 @@ const HEIGHT = /^\d+$/;
 type SearchBarProps = {
   /** Use vertical layout for narrow panels (e.g. mobile menu). */
   layout?: "inline" | "stacked";
+  /** Outer width classes (default `max-w-xl`; header passes `max-w-none` to use flex space). */
   className?: string;
 };
 
-export function SearchBar({ layout = "inline", className = "" }: SearchBarProps) {
+export function SearchBar({ layout = "inline", className = "max-w-xl" }: SearchBarProps) {
   const router = useRouter();
   const { network } = useNetwork();
   const [value, setValue] = useState("");
@@ -56,7 +57,7 @@ export function SearchBar({ layout = "inline", className = "" }: SearchBarProps)
   }, [value, network, router]);
 
   return (
-    <div className={`w-full max-w-xl ${className}`}>
+    <div className={`w-full ${className}`}>
       <div className={stacked ? "flex flex-col gap-2" : "flex gap-2"}>
         <input
           type="text"
