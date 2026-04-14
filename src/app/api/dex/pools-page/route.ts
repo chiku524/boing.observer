@@ -3,7 +3,7 @@ import { BoingRpcError, validateHex32 } from "boing-sdk";
 import { createServerBoingClient } from "@/lib/server-boing-client";
 import { dexDiagnosticsEnabled } from "@/lib/server-dex-factory";
 import { resolveNativeDexFactoryForExplorer } from "@/lib/resolve-native-dex-factory";
-import { isMainnetConfigured } from "@/lib/rpc-client";
+import { getRpcBaseUrl, isMainnetConfigured } from "@/lib/rpc-client";
 import type { NetworkId } from "@/lib/rpc-types";
 
 function parseNetwork(v: string | null): NetworkId | null {
@@ -53,17 +53,29 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const page = await client.listDexPoolsPage({
-      factory,
-      cursor: cursor || null,
-      limit,
-      light,
-      includeDiagnostics: wantDiagnostics,
-    });
+    const [page, netInfo] = await Promise.all([
+      client.listDexPoolsPage({
+        factory,
+        cursor: cursor || null,
+        limit,
+        light,
+        includeDiagnostics: wantDiagnostics,
+      }),
+      client.getNetworkInfo(),
+    ]);
+
+    let rpcHost: string;
+    try {
+      rpcHost = new URL(getRpcBaseUrl(network)).hostname;
+    } catch {
+      rpcHost = "";
+    }
 
     return NextResponse.json({
       supported: true as const,
       factory,
+      tipHeight: netInfo.head_height,
+      rpcHost,
       pools: page.pools,
       nextCursor: page.nextCursor,
       ...(wantDiagnostics && page.diagnostics ? { diagnostics: page.diagnostics } : {}),

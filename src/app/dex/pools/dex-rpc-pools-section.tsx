@@ -26,6 +26,8 @@ type PoolDiagnostics = {
 type PoolsOk = {
   supported: true;
   factory: string;
+  tipHeight?: number;
+  rpcHost?: string;
   pools: DexPoolRow[];
   nextCursor: string | null;
   diagnostics?: PoolDiagnostics;
@@ -55,6 +57,8 @@ export function DexRpcPoolsSection() {
   const [diagnosticsAllowed, setDiagnosticsAllowed] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [diagnostics, setDiagnostics] = useState<PoolDiagnostics | null>(null);
+  const [tipHeight, setTipHeight] = useState<number | null>(null);
+  const [rpcHost, setRpcHost] = useState<string | null>(null);
 
   const loadPage = useCallback(
     async (append: boolean, cursorVal: string | null) => {
@@ -81,12 +85,16 @@ export function DexRpcPoolsSection() {
         setFactory(null);
         setNextCursor(null);
         setDiagnostics(null);
+        setTipHeight(null);
+        setRpcHost(null);
         return;
       }
       const ok = json as PoolsOk;
       setUnsupported(null);
       setError(null);
       setFactory(ok.factory);
+      setTipHeight(typeof ok.tipHeight === "number" ? ok.tipHeight : null);
+      setRpcHost(typeof ok.rpcHost === "string" && ok.rpcHost ? ok.rpcHost : null);
       setNextCursor(ok.nextCursor);
       setDiagnostics(ok.diagnostics ?? null);
       setRows((prev) => (append ? [...prev, ...ok.pools] : ok.pools));
@@ -214,11 +222,36 @@ export function DexRpcPoolsSection() {
               {nextCursor ? "+" : ""})
             </h3>
             {rows.length === 0 ? (
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                No pools on this page. If you expected rows here, confirm this RPC implements{" "}
-                <code className="rounded bg-white/10 px-1 text-xs">boing_listDexPools</code> (not Method not found) and
-                that pools are registered on the resolved factory.
-              </p>
+              <div className="space-y-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+                {!nextCursor ? (
+                  <div className="rounded-lg border border-amber-500/35 bg-amber-500/10 p-4">
+                    <p className="font-medium text-amber-100/95">No registered pools for this factory</p>
+                    <p className="mt-2 text-xs text-[var(--text-muted)]">
+                      The RPC returned an empty first page — discovery has no pools under the resolved factory at tip{" "}
+                      <span className="font-mono text-[var(--text-secondary)]">{tipHeight ?? "—"}</span>
+                      {rpcHost ? (
+                        <>
+                          {" "}
+                          · <span className="font-mono text-[var(--text-secondary)]">{rpcHost}</span>
+                        </>
+                      ) : null}
+                      . That is normal on a fresh factory or a different network than where pools were created.
+                    </p>
+                    <p className="mt-2 text-xs text-[var(--text-muted)]">
+                      Confirm pool registration on this chain, or browse deploy-derived assets on the{" "}
+                      <Link href={`/tokens?network=${encodeURIComponent(network)}`} className="text-network-cyan hover:underline">
+                        token index
+                      </Link>
+                      .
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-[var(--text-muted)]">
+                    No pools on this page. Try <strong className="text-[var(--text-primary)]">Load more</strong> if more
+                    pages exist.
+                  </p>
+                )}
+              </div>
             ) : (
               <table className="w-full min-w-[56rem] text-left text-sm">
                 <thead>

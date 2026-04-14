@@ -12,6 +12,7 @@ import { getFriendlyRpcErrorMessage } from "@/lib/rpc-status";
 import { CopyButton } from "@/components/copy-button";
 import { AccountBalanceMix } from "@/components/account-balance-mix";
 import { AccountContractHints } from "@/components/account-contract-hints";
+import { AssetMetadataSection, type ExplorerAssetProfilePayload } from "@/components/asset-metadata-section";
 import { ADDRESS_FORMAT_ALIGNMENT_URL, NETWORK_FAUCET_URL } from "@/lib/constants";
 
 export function AddressExplorerView({ variant }: { variant: "account" | "asset" }) {
@@ -22,8 +23,9 @@ export function AddressExplorerView({ variant }: { variant: "account" | "asset" 
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dexLookupLoading, setDexLookupLoading] = useState(true);
-  const [inDexUniverse, setInDexUniverse] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [assetProfile, setAssetProfile] = useState<ExplorerAssetProfilePayload | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isHex64(address)) {
@@ -52,32 +54,50 @@ export function AddressExplorerView({ variant }: { variant: "account" | "asset" 
 
   useEffect(() => {
     if (!isHex64(address)) {
-      setDexLookupLoading(false);
-      setInDexUniverse(false);
+      setProfileLoading(false);
+      setAssetProfile(null);
+      setProfileError(null);
       return;
     }
     let cancelled = false;
-    setDexLookupLoading(true);
+    setProfileLoading(true);
+    setProfileError(null);
     const hexId = encodeURIComponent(toPrefixedHex64(address));
-    fetch(`/api/dex/token?network=${encodeURIComponent(network)}&id=${hexId}`, { headers: { Accept: "application/json" } })
+    const scan = variant === "asset" ? "1" : "0";
+    fetch(`/api/asset/profile?network=${encodeURIComponent(network)}&id=${hexId}&scan=${scan}`, {
+      headers: { Accept: "application/json" },
+    })
       .then(async (res) => {
-        const j = (await res.json()) as { supported?: boolean; inDexUniverse?: boolean };
-        if (!cancelled && res.ok && j.supported !== false) {
-          setInDexUniverse(Boolean(j.inDexUniverse));
-        } else if (!cancelled) {
-          setInDexUniverse(false);
+        const j = (await res.json()) as { error?: string } & Partial<ExplorerAssetProfilePayload>;
+        if (cancelled) return;
+        if (!res.ok) {
+          setAssetProfile(null);
+          setProfileError(j.error || `HTTP ${res.status}`);
+          return;
+        }
+        if (j.supported === true) {
+          setAssetProfile(j as ExplorerAssetProfilePayload);
+          setProfileError(null);
+        } else {
+          setAssetProfile(null);
+          setProfileError("Unexpected profile response");
         }
       })
       .catch(() => {
-        if (!cancelled) setInDexUniverse(false);
+        if (!cancelled) {
+          setAssetProfile(null);
+          setProfileError("Could not load asset profile");
+        }
       })
       .finally(() => {
-        if (!cancelled) setDexLookupLoading(false);
+        if (!cancelled) setProfileLoading(false);
       });
     return () => {
       cancelled = true;
     };
-  }, [network, address]);
+  }, [network, address, variant]);
+
+  const inDexUniverse = Boolean(assetProfile?.dexToken);
 
   if (!isHex64(address)) {
     return (
@@ -143,7 +163,7 @@ export function AddressExplorerView({ variant }: { variant: "account" | "asset" 
             0x{address}
           </p>
           <CopyButton value={toPrefixedHex64(address)} label="Copy address" />
-          {!dexLookupLoading && inDexUniverse && (
+          {!profileLoading && inDexUniverse && (
             <span className="inline-flex flex-wrap items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-200">
               In DEX universe
               <Link href={`/dex/tokens?network=${encodeURIComponent(network)}`} className="text-network-cyan hover:underline">
@@ -168,7 +188,19 @@ export function AddressExplorerView({ variant }: { variant: "account" | "asset" 
             {alternateLabel}
           </Link>
         </p>
+        {profileError && (
+          <p className="text-xs text-amber-300" role="status">
+            {profileError}
+          </p>
+        )}
       </header>
+
+      {profileLoading && isHex64(address) && (
+        <div className="glass-card h-32 animate-pulse rounded-lg bg-white/5" aria-busy="true" />
+      )}
+      {assetProfile && (
+        <AssetMetadataSection network={network} profile={assetProfile} scanUsed={variant === "asset"} />
+      )}
 
       {loading && (
         <div className="space-y-4 animate-pulse" aria-busy="true">
@@ -221,7 +253,20 @@ export function AddressExplorerView({ variant }: { variant: "account" | "asset" 
             </div>
             <AccountBalanceMix balance={account.balance} stake={account.stake} />
           </div>
-          <AccountContractHints network={network} address64={address} />
+          <AccountContractHints
+            network={network}
+            address64={address}
+            rpcInteractionHints={
+              assetProfile
+                ? {
+                    inDexUniverse,
+                    poolCount: assetProfile.dexToken?.poolCount,
+                    tokenKind: assetProfile.tokenIndex?.kind,
+                    purposeCategory: assetProfile.tokenIndex?.purposeCategory ?? null,
+                  }
+                : null
+            }
+          />
         </section>
       )}
     </div>

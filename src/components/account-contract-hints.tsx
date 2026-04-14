@@ -13,7 +13,20 @@ function canonHex64(h: string | null | undefined): string {
   return normalizeHex64(h.replace(/^0x/i, ""));
 }
 
-export function AccountContractHints({ network, address64 }: { network: NetworkId; address64: string }) {
+export function AccountContractHints({
+  network,
+  address64,
+  rpcInteractionHints,
+}: {
+  network: NetworkId;
+  address64: string;
+  rpcInteractionHints?: {
+    inDexUniverse: boolean;
+    poolCount?: number;
+    tokenKind?: string;
+    purposeCategory?: string | null;
+  } | null;
+}) {
   const [netInfo, setNetInfo] = useState<BoingNetworkInfo | null>(null);
   const [storageValue, setStorageValue] = useState<string | null | undefined>(undefined);
 
@@ -113,6 +126,48 @@ export function AccountContractHints({ network, address64 }: { network: NetworkI
           quotes
         </Link>
       </p>
+
+      <div className="space-y-2 border-t border-[var(--border-color)] pt-4 text-sm text-[var(--text-secondary)]">
+        <h3 className="font-medium text-[var(--text-primary)]">Interaction &amp; capabilities (RPC)</h3>
+        <ul className="list-disc space-y-1 pl-5 text-xs leading-relaxed text-[var(--text-muted)]">
+          <li>
+            <code className="rounded bg-white/10 px-1">boing_simulateContractCall</code> — dry-run reads or
+            state-changing calls with explicit calldata (see{" "}
+            <a href={RPC_SPEC_URL} className="text-network-cyan hover:underline" target="_blank" rel="noopener noreferrer">
+              RPC-API-SPEC
+            </a>
+            ).
+          </li>
+          <li>
+            <code className="rounded bg-white/10 px-1">boing_getContractStorage</code> — keyed storage reads for
+            contracts that expose the map API (slot shown above is only key{" "}
+            <code className="rounded bg-white/10 px-1">0…0</code>).
+          </li>
+          {rpcInteractionHints?.inDexUniverse && (
+            <li>
+              Listed on the native DEX for this factory
+              {typeof rpcInteractionHints.poolCount === "number" ? (
+                <> ({rpcInteractionHints.poolCount} pool{rpcInteractionHints.poolCount === 1 ? "" : "s"} in discovery)</>
+              ) : null}
+              . Swaps and liquidity routes are exercised through the node&apos;s DEX transaction family — this explorer does
+              not submit trades.
+            </li>
+          )}
+          {rpcInteractionHints?.tokenKind && rpcInteractionHints.tokenKind !== "other" && (
+            <li>
+              Deploy / index kind: <span className="text-[var(--text-secondary)]">{rpcInteractionHints.tokenKind}</span>
+              {rpcInteractionHints.purposeCategory ? (
+                <>
+                  {" "}
+                  (<span className="break-words">{rpcInteractionHints.purposeCategory}</span>)
+                </>
+              ) : null}
+              . Concrete entrypoints still depend on the contract bytecode; use simulation with the program&apos;s documented
+              selectors where available.
+            </li>
+          )}
+        </ul>
+      </div>
 
       <div className="border-t border-[var(--border-color)] pt-4 text-xs leading-relaxed text-[var(--text-muted)]">
         <p className="font-medium text-[var(--text-secondary)]">Indexer &amp; bytecode scope</p>

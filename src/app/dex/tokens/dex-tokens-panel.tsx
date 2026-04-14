@@ -27,6 +27,8 @@ type TokenDiagnostics = {
 type TokensOk = {
   supported: true;
   factory: string;
+  tipHeight?: number;
+  rpcHost?: string;
   tokens: DexTokenRow[];
   nextCursor: string | null;
   diagnostics?: TokenDiagnostics;
@@ -56,6 +58,8 @@ export function DexTokensPanel() {
   const [diagnosticsAllowed, setDiagnosticsAllowed] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [diagnostics, setDiagnostics] = useState<TokenDiagnostics | null>(null);
+  const [tipHeight, setTipHeight] = useState<number | null>(null);
+  const [rpcHost, setRpcHost] = useState<string | null>(null);
 
   const loadPage = useCallback(
     async (append: boolean, cursorVal: string | null) => {
@@ -82,12 +86,16 @@ export function DexTokensPanel() {
         setFactory(null);
         setNextCursor(null);
         setDiagnostics(null);
+        setTipHeight(null);
+        setRpcHost(null);
         return;
       }
       const ok = json as TokensOk;
       setUnsupported(null);
       setError(null);
       setFactory(ok.factory);
+      setTipHeight(typeof ok.tipHeight === "number" ? ok.tipHeight : null);
+      setRpcHost(typeof ok.rpcHost === "string" && ok.rpcHost ? ok.rpcHost : null);
       setNextCursor(ok.nextCursor);
       setDiagnostics(ok.diagnostics ?? null);
       setRows((prev) => (append ? [...prev, ...ok.tokens] : ok.tokens));
@@ -221,11 +229,37 @@ export function DexTokensPanel() {
               {nextCursor ? "+" : ""})
             </h2>
             {rows.length === 0 ? (
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                No tokens in this page. Tokens appear only after they are part of at least one pool under the factory and
-                the node supports <code className="rounded bg-white/10 px-1 text-xs">boing_listDexTokens</code>. Try{" "}
-                <strong className="text-[var(--text-primary)]">Load more</strong> if the cursor paginator has more pages.
-              </p>
+              <div className="space-y-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+                {!nextCursor ? (
+                  <div className="rounded-lg border border-amber-500/35 bg-amber-500/10 p-4">
+                    <p className="font-medium text-amber-100/95">No DEX-listed tokens at this factory</p>
+                    <p className="mt-2 text-xs text-[var(--text-muted)]">
+                      The RPC returned an empty first page: either no pools have been registered on this chain for the
+                      resolved factory, or discovery has not indexed them yet. Chain tip{" "}
+                      <span className="font-mono text-[var(--text-secondary)]">{tipHeight ?? "—"}</span>
+                      {rpcHost ? (
+                        <>
+                          {" "}
+                          · host <span className="font-mono text-[var(--text-secondary)]">{rpcHost}</span>
+                        </>
+                      ) : null}
+                      .
+                    </p>
+                    <p className="mt-2 text-xs text-[var(--text-muted)]">
+                      Deployed assets from receipts (even before DEX listing) appear on the{" "}
+                      <Link href={`/tokens?network=${encodeURIComponent(network)}`} className="text-network-cyan hover:underline">
+                        token index
+                      </Link>
+                      . After you add liquidity and register a pair, refresh this directory.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-[var(--text-muted)]">
+                    No tokens in this page. Try <strong className="text-[var(--text-primary)]">Load more</strong> if the
+                    cursor paginator has more pages.
+                  </p>
+                )}
+              </div>
             ) : (
               <table className="w-full min-w-[52rem] text-left text-sm">
                 <thead>

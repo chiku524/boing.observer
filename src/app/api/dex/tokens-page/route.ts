@@ -3,7 +3,7 @@ import { BoingRpcError, validateHex32 } from "boing-sdk";
 import { createServerBoingClient } from "@/lib/server-boing-client";
 import { dexDiagnosticsEnabled } from "@/lib/server-dex-factory";
 import { resolveNativeDexFactoryForExplorer } from "@/lib/resolve-native-dex-factory";
-import { isMainnetConfigured } from "@/lib/rpc-client";
+import { getRpcBaseUrl, isMainnetConfigured } from "@/lib/rpc-client";
 import type { NetworkId } from "@/lib/rpc-types";
 
 function parseNetwork(v: string | null): NetworkId | null {
@@ -53,13 +53,23 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const page = await client.listDexTokensPage({
-      factory,
-      cursor: cursor || null,
-      limit,
-      light,
-      includeDiagnostics: wantDiagnostics,
-    });
+    const [page, netInfo] = await Promise.all([
+      client.listDexTokensPage({
+        factory,
+        cursor: cursor || null,
+        limit,
+        light,
+        includeDiagnostics: wantDiagnostics,
+      }),
+      client.getNetworkInfo(),
+    ]);
+
+    let rpcHost: string;
+    try {
+      rpcHost = new URL(getRpcBaseUrl(network)).hostname;
+    } catch {
+      rpcHost = "";
+    }
 
     const tokens = page.tokens.map((row) => {
       const { diagnostics: _omit, ...rest } = row;
@@ -70,6 +80,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       supported: true as const,
       factory,
+      tipHeight: netInfo.head_height,
+      rpcHost,
       tokens,
       nextCursor: page.nextCursor,
       ...(wantDiagnostics && page.diagnostics ? { diagnostics: page.diagnostics } : {}),
