@@ -6,6 +6,7 @@ import {
   fetchBlocksWithReceiptsForHeightRange,
   fetchNativeDexDirectorySnapshot,
 } from "boing-sdk";
+import { tryPredictDeployedContractAddressFromDeployTx } from "@/lib/deploy-contract-address";
 import { receiptReturnDataHex, tryParseCreatedAccountIdFromDeployReturnData } from "@/lib/deploy-receipt";
 import { hexForLink, normalizeHex64 } from "@/lib/rpc-types";
 import {
@@ -131,6 +132,10 @@ export async function buildTokenIndexForHeightRange(
   ]);
 
   const indexWarnings: string[] = [];
+  indexWarnings.push(
+    "Boing deploy receipts use empty return_data today; new contract ids are inferred with the same CREATE2 / nonce-derived rules as the node.",
+  );
+
   if (dexSnap.defaults.nativeDexFactoryAccountHex == null) {
     indexWarnings.push(
       "No native DEX factory address could be resolved (RPC chain_id / end_user hints missing and no BOING_NATIVE_VM_DEX_FACTORY-style env override). register_pair tokens were not merged — only deploy receipts count.",
@@ -158,7 +163,9 @@ export async function buildTokenIndexForHeightRange(
       if (!isContractDeployPayloadKind(kind)) continue;
       const receipt = receipts[i];
       if (receipt == null || receipt.success === false) continue;
-      const addr = tryParseCreatedAccountIdFromDeployReturnData(receiptReturnDataHex(receipt));
+      const addr =
+        tryParseCreatedAccountIdFromDeployReturnData(receiptReturnDataHex(receipt)) ??
+        tryPredictDeployedContractAddressFromDeployTx(tx, tx.payload);
       if (!addr) continue;
       const inner = getTxPayloadInner(tx.payload);
       const purpose =
