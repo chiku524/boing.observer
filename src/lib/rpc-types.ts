@@ -186,6 +186,10 @@ export interface BoingNetworkInfo {
     validator_count?: number;
     model?: string;
   };
+  /** Discovery modes advertised with the same RPC snapshot as DEX list methods. */
+  developer?: {
+    dex_discovery_methods?: string[];
+  } | null;
   end_user?: {
     chain_display_name?: string;
     explorer_url?: string | null;
